@@ -1,11 +1,11 @@
-enum CardSuit {
+export enum CardSuit {
   Hearts = "heart",
   Diamonds = "diamonds",
   Clubs = "clubs",
   Spades = "spades"
 }
 
-class Card {
+export class Card {
   private rank: number;
   private suit: CardSuit;
 
@@ -20,9 +20,17 @@ class Card {
       suit: this.suit
     };
   }
+
+  get getRank() {
+    return this.rank
+  }
+
+  get getSuit() {
+    return this.suit
+  }
 }
 
-abstract class Deck {
+export abstract class Deck {
   private cards: Card[];
 
   constructor() {
@@ -57,7 +65,7 @@ abstract class Deck {
   }
 
   // Initialize hands for a specific games
-  abstract initializeHand(hand1: Card[], hand2: Card[], hand3: Card[], hand4: Card, hand5: Card): void;
+  abstract initializeHand(numHand: number): Card[][];
 }
 
 
