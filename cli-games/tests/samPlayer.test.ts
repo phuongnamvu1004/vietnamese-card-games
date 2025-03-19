@@ -1,5 +1,4 @@
 import { Card, CardSuit } from "../cards";
-import { SamDeck } from "../sam/sam";
 import { SamUserPlayer } from "../sam/samPlayer";
 
 describe('testing sam instant-win hand', () => {

@@ -1,4 +1,11 @@
 import { Card, Deck } from "../cards"
+import { Game } from "../core/game"
+
+export class SamGame extends Game {
+  todo() {
+    // TODO: Implement the SamGame class
+  }
+}
 
 export class SamDeck extends Deck {
   initializeHand(numHand: number): Card[][] {
