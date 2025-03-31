@@ -1,7 +1,11 @@
 import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+import { Response } from "express";
 
-export const generateToken = (userId, res) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+config({ path: ".env.local" });
+
+export const generateToken = (userId: string, res: Response) => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET!, {
     expiresIn: "7d",
   });
 

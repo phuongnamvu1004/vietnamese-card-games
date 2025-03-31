@@ -1,24 +1,30 @@
-import { generateToken } from "../lib/utils.js";
-import User from "../models/user.model.js";
+import { generateToken } from "../lib/utils";
 import bcrypt from "bcryptjs";
-import cloudinary from "../lib/cloudinary.js";
+import cloudinary from "../lib/cloudinary";
 
 import { Request, Response } from "express";
 
-export const signup = async (req: Request, res: Response) => {
+import User from "../models/user.model";
+import { IUser } from "../models/user.model";
+
+interface AuthRequest extends Request {
+  user?: IUser;
+}
+
+export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body;
   try {
     if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      res.status(400).json({ message: "All fields are required" });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const user = await User.findOne({ email });
 
-    if (user) return res.status(400).json({ message: "Email already exists" });
+    if (user) res.status(400).json({ message: "Email already exists" });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -31,7 +37,7 @@ export const signup = async (req: Request, res: Response) => {
 
     if (newUser) {
       // generate jwt token here
-      generateToken(newUser._id, res);
+      generateToken(newUser._id.toString(), res);
       await newUser.save();
 
       res.status(201).json({
@@ -49,27 +55,27 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    const isPasswordCorrect = await bcrypt.compare(password, user!.password);
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    generateToken(user!._id.toString(), res);
 
     res.status(200).json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      profilePic: user.profilePic,
+      _id: user!._id,
+      fullName: user!.fullName,
+      email: user!.email,
+      profilePic: user!.profilePic,
     });
   } catch (error) {
     console.log("Error in login controller", (error as Error).message);
@@ -77,7 +83,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = (req: Request, res: Response) => {
+export const logout = (_req: Request, res: Response): void => {
   try {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
@@ -87,10 +93,10 @@ export const logout = (req: Request, res: Response) => {
   }
 };
 
-export const updateProfile = async (req: Request, res: Response) => {
+export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
     const { profilePic } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     if (!profilePic) {
       return res.status(400).json({ message: "Profile pic is required" });
@@ -110,7 +116,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const checkAuth = (req: Request, res: Response) => {
+export const checkAuth = (req: AuthRequest, res: Response) => {
   try {
     res.status(200).json(req.user);
   } catch (error) {
