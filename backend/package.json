@@ -10,7 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.15.0",
+    "mongoose": "^8.13.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

@@ -7,7 +7,7 @@ build/
 
 # OS & editor files
 .DS_Store
-.env
+.env*
 *.log
 
 # IDE files
