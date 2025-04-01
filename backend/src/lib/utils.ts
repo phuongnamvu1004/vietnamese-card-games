@@ -18,3 +18,29 @@ export const generateToken = (userId: string, res: Response) => {
 
   return token;
 };
+
+export default function log(...args: any[]): void {
+  const messages = args.length > 1 ? args.slice(0, args.length - 1) : args;
+  let level = args.length > 1 ? args[args.length - 1] || "info" : "info";
+  level = typeof level === "string" ? level.toLowerCase() : "info";
+  const timestamp = new Date().toISOString();
+
+  const formattedMessages = messages
+    .map((msg) =>
+      typeof msg === "object" ? `\n${JSON.stringify(msg, null, 2)}` : msg
+    )
+    .join(" ");
+
+  const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${formattedMessages}`;
+
+  switch (level) {
+    case "error":
+      console.error(logMessage);
+      break;
+    case "warn":
+      console.warn(logMessage);
+      break;
+    default:
+      console.log(logMessage);
+  }
+}
