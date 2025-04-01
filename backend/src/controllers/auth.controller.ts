@@ -5,21 +5,18 @@ import cloudinary from "../lib/cloudinary";
 import { Request, Response } from "express";
 
 import User from "../models/user.model";
-import { IUser } from "../models/user.model";
-
-interface AuthRequest extends Request {
-  user?: IUser;
-}
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body;
   try {
     if (!fullName || !email || !password) {
       res.status(400).json({ message: "All fields are required" });
+      return;
     }
 
     if (password.length < 6) {
       res.status(400).json({ message: "Password must be at least 6 characters" });
+      return;
     }
 
     const user = await User.findOne({ email });
@@ -62,11 +59,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     if (!user) {
       res.status(400).json({ message: "Invalid credentials" });
+      return;
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user!.password);
     if (!isPasswordCorrect) {
       res.status(400).json({ message: "Invalid credentials" });
+      return;
     }
 
     generateToken(user!._id.toString(), res);
@@ -93,13 +92,14 @@ export const logout = (_req: Request, res: Response): void => {
   }
 };
 
-export const updateProfile = async (req: AuthRequest, res: Response) => {
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const { profilePic } = req.body;
     const userId = req.user?._id;
 
     if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+      res.status(400).json({ message: "Profile pic is required" });
+      return;
     }
 
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
@@ -116,7 +116,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const checkAuth = (req: AuthRequest, res: Response) => {
+export const checkAuth = (req: Request, res: Response): void => {
   try {
     res.status(200).json(req.user);
   } catch (error) {

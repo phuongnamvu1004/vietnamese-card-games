@@ -1,6 +1,29 @@
 ## Schemas
-- General
+- User schema
+```ts
+type User = {
+  id: string,
+  email: string,
+  fullName: string,
+  password: string,
+  profilePic?: string,
+  statistics: {
+    numGamesPlayed: number,
+    numGamesWon: number,
+    numInstantWins: {
+      dragonStraight: number,
+      fourTwos: number,
+      flushHand: number,
+      threeTriplets: number,
+      fivePairs: number
+    },
+    winRate: number // numGamesWon / numGamesPlayed
+  },
+  currentBalance: number
+}
+```
 
+- Card/deck schema
 ```ts
 export enum Suit {
   Spade = "spade",
@@ -71,6 +94,7 @@ type Player = {
   id: string,
   socketId: string,
   hand: Card[],
+  buyIn: number,
   state: "instantWin" | "waitingForTurn" | "inTurn"
 }
 
@@ -84,6 +108,6 @@ type GameState = {
   // playing is marked by after dealing the cards 
   // finish is for then the game has finished all the turns
   phase: "waiting" | "playing" | "finish",
-  instantWinPlayers: Player[]
+  instantWinPlayers: Player[] // For this case, check for instant wins for all player then rank them to determine who 
 }
 ```
