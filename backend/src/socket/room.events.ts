@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { nanoid } from 'nanoid';
 import Room from '../models/room.model';
+import { Card, shuffleDeck } from '../game/shared/cards';
 import { getGameState, updateGameState } from '../redis/gameState';
 import type { CurrentGameState, Player } from '../types/game';
 
@@ -8,7 +9,7 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
   /**
    * CREATE ROOM
    */
-  socket.on('createRoom', async ({ hostUserId, gameType, maxPlayers, otherPlayers }, callback) => {
+  socket.on('createRoom', async ({ hostUserId, gameType, maxPlayers, otherPlayers, buyIn, valuePerPoint }, callback) => {
     try {
       const roomId = nanoid(8); // short room code like "X3P9F2GQ"
 
@@ -20,12 +21,17 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
         gameType,
         maxPlayers,
         players,
+        buyIn,
+        valuePerPoint,
       });
+
+      let deck: Card[] = Card.createDeck();
+      deck = shuffleDeck(deck);
 
       // 2. Init game state in Redis
       const initialState: CurrentGameState = {
         players,
-        deck: [],
+        deck,
         pile: [],
         currentTurn: "",
         phase: "waiting",

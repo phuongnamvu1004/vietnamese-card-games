@@ -8,6 +8,8 @@ export interface IRoom extends Document {
   gameType: "sam" | "phom",
   maxPlayers: number,
   players: string[],
+  buyIn: number,
+  valuePerPoint: number,
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +38,14 @@ const userSchema = new Schema<IRoom>(
       type: [String],
       required: true,
       min: 2,
+    },
+    buyIn: {
+      type: Number,
+      required: true,
+    },
+    valuePerPoint: {
+      type: Number,
+      required: true 
     }
   },
   { timestamps: true }
