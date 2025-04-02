@@ -23,6 +23,7 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
         players,
         buyIn,
         valuePerPoint,
+        gameLog: [],
       });
 
       let deck: Card[] = Card.createDeck();

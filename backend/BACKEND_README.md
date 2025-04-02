@@ -111,3 +111,109 @@ type GameState = {
   instantWinPlayers: Player[] // For this case, check for instant wins for all player then rank them to determine who 
 }
 ```
+
+- Rules schemas
+**Sam's rules**
+```ts
+enum Move {
+  pass = "pass",
+  hit = "hit",
+  invade = "invade"
+}
+
+class RoundType {
+  static Single = new RoundType("single");
+  static Pair = new RoundType("pair");
+  static Triplet = new RoundType("triplet");
+  static FourOfAKind = new RoundType("fourOfAKind");
+  static Straight = (length: number) => new RoundType(`straight(${length})`);
+
+  private constructor(public readonly value: string) {}
+
+  toString() {
+    return this.value;
+  }
+
+  // for straight only, check for higher straight
+  static isHigherStraight(current: Card[], previous: Card[]): boolean {
+    const currentRanks = current.map(card => card.rank).sort((a, b) => a - b);
+    const previousRanks = previous.map(card => card.rank).sort((a, b) => a - b);
+
+    if (currentRanks.length !== previousRanks.length) {
+      return false;
+    }
+
+    return currentRanks[currentRanks.length - 1] > previousRanks[previousRanks.length - 1];
+  }
+
+}
+
+// Check for same RoundType first then compare the highest of element of prevPlayedCards and currentCards
+export const validateMove = (
+  prevPlayedCards: Card[], 
+  currentCards: Card[], 
+  roundType?: RoundType
+): boolean => {
+  if (!roundType) {
+    roundType = determineRoundType(prevPlayedCards);
+  }
+
+  currentRoundType = determineRoundType(currentCards);
+
+  if (!currentRoundType || currentRoundType !== roundType) {
+    return false;
+  } else {
+
+  }
+
+
+  return true; // Placeholder return value
+};
+
+function determineRoundType(cards: Card[]): RoundType | undefined {
+  // check for single
+  if (cards.length === 1) {
+    return RoundType.Single;
+  }
+
+  cardValueDict = {}
+
+  for (const card of cards) {
+    cardValueDict.card.getValue() += 1
+  }
+  // check for pair
+  if (cards.length === 2 && cardValueDict.length === 1) {
+    return RoundType.Pair;
+  }
+
+  // check for triplet
+  if (cards.length === 3 && cardValueDict.length === 1) {
+    return RoundType.Triplet;
+  }
+
+  // check for fourOfAKind
+  if (cards.length === 4 && cardValueDict.length === 1) {
+    return RoundType.FourOfAKind;
+  }
+
+  // check for straight
+  if (cards.length >= 3) {
+    const sortedCards = cards
+      .map(card => card.rank)
+      .sort((a, b) => a - b);
+
+    for (let i = 1; i < sortedCards.length; i++) {
+      if (sortedCards[i] !== sortedCards[i - 1] + 1) {
+        return undefined; // Not a straight
+      }
+    }
+
+    return RoundType.Straight;
+  }
+
+  return undefined
+  
+}
+```
+
+

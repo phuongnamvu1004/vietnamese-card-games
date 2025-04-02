@@ -8,6 +8,10 @@ export enum Suit {
 export class Card {
   constructor(public suit: Suit, public rank: number) {}
 
+  get getRank(): number {
+    return this.rank;
+  }
+
   toString(): string {
     const rankStr = Card.rankToString(this.rank);
     return `${rankStr} of ${this.suit}`;

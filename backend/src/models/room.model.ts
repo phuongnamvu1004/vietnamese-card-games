@@ -1,5 +1,6 @@
 // models/user.model.ts
 import mongoose, { Document, Schema, Types } from "mongoose";
+import { GameLog } from "../types/game";
 
 export interface IRoom extends Document {
   _id: Types.ObjectId;
@@ -10,6 +11,7 @@ export interface IRoom extends Document {
   players: string[],
   buyIn: number,
   valuePerPoint: number,
+  gameLog: GameLog[],
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,8 +47,18 @@ const userSchema = new Schema<IRoom>(
     },
     valuePerPoint: {
       type: Number,
-      required: true 
-    }
+      required: true,
+    },
+    gameLog: {
+      type: [
+        {
+          playerId: { type: String, required: true },
+          action: { type: String, required: true },
+          timestamp: { type: Date, required: true },
+        },
+      ],
+      required: true,
+    },
   },
   { timestamps: true }
 );

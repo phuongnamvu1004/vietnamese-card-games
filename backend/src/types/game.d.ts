@@ -17,3 +17,10 @@ type CurrentGameState = {
   phase: "waiting" | "playing" | "finish",
   instantWinPlayers: string[]
 }
+
+type GameLog = {
+  playerId: string,
+  action: "draw" | "play" | "discard" | "instantWin",
+  card: Card,
+  createdAt: Date
+}

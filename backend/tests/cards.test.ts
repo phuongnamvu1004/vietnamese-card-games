@@ -1,9 +1,10 @@
 import { Suit, Card, shuffleDeck, dealCards } from "../src/game/shared/cards";
 
 describe("Card class test", () => {
-  test("Card creation and string representation", () => {
+  test("Card creation + string representation + getRank", () => {
     const card = new Card(Suit.Heart, 1);
     expect(card.toString()).toBe("A of heart");
+    expect(card.getRank).toBe(1);
   });
 
   test("Deck creation", () => {
