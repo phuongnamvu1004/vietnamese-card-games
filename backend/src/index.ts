@@ -6,6 +6,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import authRouter from "./routes/auth.routes"
+import userRouter from "./routes/user.routes"
 
 const app = express()
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 app.listen(process.env.PORT || 3000, () => {
   log("Server is listening on port 3000", "info");
