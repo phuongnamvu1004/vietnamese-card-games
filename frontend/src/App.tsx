@@ -1,25 +1,34 @@
-
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from "./pages/Home";
-import Login from "./Components/pages/Login.tsx";
-import Signup from "./Components/pages/Signup.tsx";
-import Navbar from "./Components/pages/Navbar";
+import Home from "./Components/pages/Home"; // This is now your Welcome page
+import Login from "./Components/pages/Login";
+// import Signup from "./Components/pages/Signup";
+// import Navbar from "./Components/pages/Navbar";
 
-import { useAuthStore } from "./store/useAuthStore";
-
+// import { useAuthStore } from "./store/UseAuthStore";
+// import { useEffect } from 'react';
 
 const App = () => {
-  const { user, isAuthenticated } = useAuthStore();
+  // const { authUser, checkAuth } = useAuthStore();
+
+  // useEffect(() => {
+  //   checkAuth();
+  // }, [checkAuth]);
+
+  // console.log({authUser});
+  
+  // // If the user is logged in, show the navbar
+  // const showNavbar = authUser !== null;
+
   return (
     <div>
-      <Navbar/>
-        <Routes/>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+      {/* {showNavbar && <Navbar />} */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        {/* <Route path="/signup" element={<Signup />} /> */}
+      </Routes>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
