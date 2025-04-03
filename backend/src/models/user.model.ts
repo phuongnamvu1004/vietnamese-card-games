@@ -44,9 +44,9 @@ export const createUser = async (user: {
     .insert([
       {
         email: user.email,
-        full_name: user.fullName,        // 👈 correct field name
+        full_name: user.fullName,        
         password: user.password,
-        profile_pic: user.profilePic || "" // 👈 correct field name
+        profile_pic: user.profilePic || "" 
       }
     ])
     .select()
