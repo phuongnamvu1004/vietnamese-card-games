@@ -1,14 +1,15 @@
-import { generateToken } from "../lib/utils";
-import bcrypt from "bcryptjs";
-import cloudinary from "../lib/cloudinary";
-import log from "../lib/utils";
-
 import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 
-import User from "../models/user.model";
+import { generateToken, log } from "../lib/utils";
+
+import cloudinary from "../lib/cloudinary";
+
+import { findUserByEmail, createUser, updateUserProfilePic } from "../models/user.model";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body;
+
   try {
     if (!fullName || !email || !password) {
       log("All fields are required", "warn");
@@ -22,49 +23,53 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await User.findOne({ email });
+    const user = await findUserByEmail(email);
 
     if (user) {
       log("Email already exists", "warn");
       res.status(400).json({ message: "Email already exists" });
       return;
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({
+    const newUser = await createUser({
       fullName,
       email,
       password: hashedPassword,
+      profilePic: "", // default profile pic
     });
 
-    if (newUser) {
-      // generate jwt token here
-      generateToken(newUser._id.toString(), res);
-      await newUser.save();
-
-      log("User created successfully:", newUser, "info");
-
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
-      });
-    } else {
+    if (!newUser) {
       log("Invalid user data", "warn");
       res.status(400).json({ message: "Invalid user data" });
+      return;
     }
+
+    // generate jwt token here
+    generateToken(newUser.id.toString(), res);
+
+    log("User created successfully:", newUser, "info");
+
+    res.status(201).json({
+      id: newUser.id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      profilePic: newUser.profilePic,
+    });
   } catch (error) {
     log("Error in signup controller", (error as Error).message, "error");
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
+
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
+
   try {
-    const user = await User.findOne({ email });
+    const user = await findUserByEmail(email);
 
     if (!user) {
       log("Invalid credentials", "warn");
@@ -72,22 +77,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user!.password);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       log("Invalid credentials", "warn");
       res.status(400).json({ message: "Invalid credentials" });
       return;
     }
 
-    generateToken(user!._id.toString(), res);
+    generateToken(user.id.toString(), res);
 
     log("User logged in successfully:", user, "info");
 
     res.status(200).json({
-      _id: user!._id,
-      fullName: user!.fullName,
-      email: user!.email,
-      profilePic: user!.profilePic,
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
     });
   } catch (error) {
     log("Error in login controller", (error as Error).message, "error");
@@ -109,7 +114,7 @@ export const logout = (_req: Request, res: Response): void => {
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const { profilePic } = req.body;
-    const userId = req.user?._id;
+    const userId = req.user!.id; // ✅ Use numeric `id`
 
     if (!profilePic) {
       log("Profile pic is required", "warn");
@@ -118,17 +123,19 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     }
 
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
+
+    const updatedUser = await updateUserProfilePic(userId, uploadResponse.secure_url);
+
+    if (!updatedUser) {
+      log("Failed to update user profile", "error");
+      res.status(500).json({ message: "Failed to update user profile" });
+      return;
+    }
 
     log("User profile updated successfully:", updatedUser, "info");
-
     res.status(200).json(updatedUser);
   } catch (error) {
-    log("error in update profile:", error, "error");
+    log("error in update profile:", (error as Error).message, "error");
     res.status(500).json({ message: "Internal server error" });
   }
 };

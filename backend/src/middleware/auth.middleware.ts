@@ -1,15 +1,15 @@
+// middleware/auth.middleware.ts
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { config } from "dotenv";
-import log from "../lib/utils.js";
+import { log } from "../lib/utils";
+import { getUserById } from "../models/user.model";
 
 config({ path: ".env.local" });
 
-import User from "../models/user.model.js";
-
 export const protectRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    log("Cookies received:", req.cookies, "info"); // Use the custom logger
+    log("Cookies received:", req.cookies, "info");
     const token = req.cookies.jwt;
 
     if (!token) {
@@ -26,9 +26,9 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    log("Successfully decoded token:", decoded, "info"); 
+    const userId = (decoded as jwt.JwtPayload).userId;
 
-    const user = await User.findById((decoded as jwt.JwtPayload).userId).select("-password");
+    const user = await getUserById(Number(userId));
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
@@ -36,7 +36,6 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
     }
 
     req.user = user;
-
     log("User authenticated successfully:", user, "info");
 
     next();

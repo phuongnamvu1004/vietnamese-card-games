@@ -1,7 +1,7 @@
 import express from "express";
-import { connectDB } from "./lib/db";
+import { connectDB } from "./database/db";
 import cookieParser from "cookie-parser";
-import log from "./lib/utils";
+import { log } from "./lib/utils";
 import { config } from "dotenv";
 config({ path: ".env.local" });
 

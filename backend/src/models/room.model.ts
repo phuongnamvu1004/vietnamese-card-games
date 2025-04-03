@@ -1,68 +1,62 @@
-// models/user.model.ts
-import mongoose, { Document, Schema, Types } from "mongoose";
-import { GameLog } from "../types/game";
+// models/room.model.ts
+import { supabase } from "../database/db";
 
-export interface IRoom extends Document {
-  _id: Types.ObjectId;
+export interface Room {
+  id: number;
   roomId: string;
-  hostUserId: string,
-  gameType: "sam" | "phom",
-  maxPlayers: number,
-  players: string[],
-  buyIn: number,
-  valuePerPoint: number,
-  gameLog: GameLog[],
-  createdAt: Date;
-  updatedAt: Date;
+  hostUserId: number;
+  gameType: "sam" | "phom";
+  maxPlayers: number;
+  buyIn: number;
+  valuePerPoint: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const userSchema = new Schema<IRoom>(
-  {
-    roomId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    hostUserId: {
-      type: String,
-      required: true,
-    },
-    gameType: {
-      type: String,
-      required: true,
-    },
-    maxPlayers: {
-      type: Number,
-      required: true,
-      default: 4,
-    },
-    players: {
-      type: [String],
-      required: true,
-      min: 2,
-    },
-    buyIn: {
-      type: Number,
-      required: true,
-    },
-    valuePerPoint: {
-      type: Number,
-      required: true,
-    },
-    gameLog: {
-      type: [
-        {
-          playerId: { type: String, required: true },
-          action: { type: String, required: true },
-          timestamp: { type: Date, required: true },
-        },
-      ],
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+export interface RoomPlayer {
+  roomId: number;
+  userId: number;
+}
 
-const Room = mongoose.model<IRoom>("Room", userSchema);
+export interface GameLogEntry {
+  roomId: number;
+  playerId: number;
+  action: string;
+  timestamp: string;
+}
 
-export default Room;
+export const findRoomByRoomId = async (roomId: string): Promise<Room | null> => {
+  const { data, error } = await supabase
+    .from("rooms")
+    .select("*")
+    .eq("room_id", roomId)
+    .single();
+
+  if (error) {
+    console.error("Error finding room:", error);
+    return null;
+  }
+
+  return data;
+};
+
+export const createRoom = async (room: Partial<Room>, players: number[], gameLog: GameLogEntry[]) => {
+  const { data, error } = await supabase.from("rooms").insert([room]).select();
+
+  if (error || !data || data.length === 0) {
+    throw error;
+  }
+
+  const roomId = data[0].id;
+
+  // Add players
+  const playerInserts = players.map((userId) => ({ room_id: roomId, user_id: userId }));
+  await supabase.from("room_players").insert(playerInserts);
+
+  // Add game logs
+  await supabase.from("game_logs").insert(
+    gameLog.map((entry) => ({ ...entry, room_id: roomId }))
+  );
+
+  return data[0];
+};
