@@ -8,7 +8,7 @@ dist/
 *.log
 
 # Environment variables
-.env
+.env.local
 
 # Editor/IDE
 .vscode/
