@@ -12,7 +12,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export const connectDB = async () => {
   try {
     // Example query to test the connection
-    const { data, error } = await supabase.from('test_table').select('*').limit(1);
+    const { data, error } = await supabase.from('users').select('*').limit(1);
+    
+    log("Testing Supabase connection by fetching data...", data, "info");
 
     if (error) {
       throw error;
