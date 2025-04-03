@@ -6,7 +6,7 @@ export enum Suit {
 };
 
 export class Card {
-  constructor(public suit: Suit, public rank: number) {}
+  constructor(private suit: Suit, private rank: number) {}
 
   get getRank(): number {
     return this.rank;
