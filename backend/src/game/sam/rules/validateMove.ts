@@ -1,43 +1,4 @@
-import { Card } from "../shared/cards"
-
-export const validateMove = (previousState: Card[], move: Card[]): boolean | "quadrupletStopTwo" => {
-  // when at first turn, no cards are played
-
-  const prevMoveType = getMoveType(previousState);
-  const curMoveType = getMoveType(move);
-
-  if (prevMoveType.type === MoveType.INVALID || curMoveType.type === MoveType.INVALID) {
-    return false;
-  }
-
-  // check for higher straight
-  if (prevMoveType.type === MoveType.STRAIGHT && curMoveType.type === MoveType.STRAIGHT) {
-    return curMoveType.length! === prevMoveType.length! && curMoveType.idCard! > prevMoveType.idCard!
-  }
-
-  if (prevMoveType.type === curMoveType.type) {
-    // check for edge cases where 2 is hit and prevMoveType.type === curMoveType.type (different case than using quadruplet to stop 2)
-    if (prevMoveType.idCard === 2) {
-      return false;
-    }
-    if (prevMoveType.idCard !== 2 && curMoveType.idCard === 2) {
-      return true;
-    }
-
-    // regular higher rank check for single, double, quadruplet
-    return curMoveType.idCard! > prevMoveType.idCard!
-  }
-
-  // check for where using quadruplet to stop 2
-  if (prevMoveType.type === MoveType.SINGLE && prevMoveType.idCard! === 2 && curMoveType.type === MoveType.QUADRUPLET) {
-    return "quadrupletStopTwo";
-  }
-
-  // final case where prevMoveType.type !== curMoveType.type and it is not quadrupletStopTwo
-  return false;
-
-
-}
+import { Card } from "../../shared/cards"
 
 export enum MoveType {
   SINGLE = "single",
@@ -119,3 +80,43 @@ export const getMoveType = (cards: Card[]) => {
     type: MoveType.INVALID
   };
 }
+
+export const validateMove = (previousState: Card[], move: Card[]): boolean | "quadrupletStopTwo" => {
+  // when at first turn, no cards are played
+
+  const prevMoveType = getMoveType(previousState);
+  const curMoveType = getMoveType(move);
+
+  if (prevMoveType.type === MoveType.INVALID || curMoveType.type === MoveType.INVALID) {
+    return false;
+  }
+
+  // check for higher straight
+  if (prevMoveType.type === MoveType.STRAIGHT && curMoveType.type === MoveType.STRAIGHT) {
+    return curMoveType.length! === prevMoveType.length! && curMoveType.idCard! > prevMoveType.idCard!
+  }
+
+  if (prevMoveType.type === curMoveType.type) {
+    // check for edge cases where 2 is hit and prevMoveType.type === curMoveType.type (different case than using quadruplet to stop 2)
+    if (prevMoveType.idCard === 2) {
+      return false;
+    }
+    if (prevMoveType.idCard !== 2 && curMoveType.idCard === 2) {
+      return true;
+    }
+
+    // regular higher rank check for single, double, quadruplet
+    return curMoveType.idCard! > prevMoveType.idCard!
+  }
+
+  // check for where using quadruplet to stop 2
+  if (prevMoveType.type === MoveType.SINGLE && prevMoveType.idCard! === 2 && curMoveType.type === MoveType.QUADRUPLET) {
+    return "quadrupletStopTwo";
+  }
+
+  // final case where prevMoveType.type !== curMoveType.type and it is not quadrupletStopTwo
+  return false;
+}
+
+
+

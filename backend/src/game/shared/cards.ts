@@ -12,6 +12,10 @@ export class Card {
     return this.rank;
   }
 
+  get getSuit(): Suit {
+    return this.suit;
+  }
+
   toString(): string {
     const rankStr = Card.rankToString(this.rank);
     return `${rankStr} of ${this.suit}`;
@@ -51,7 +55,7 @@ export function shuffleDeck(deck: Card[]): Card[] {
 }
 
 export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: number): Card[][] {
-  const hands: Card[][] = Array.from({ length: numPlayers }, () => []);
+  const hands: Card[][] = Array.from({length: numPlayers}, () => []);
 
   for (let i = 0; i < cardsPerPlayer; i++) {
     for (let p = 0; p < numPlayers; p++) {

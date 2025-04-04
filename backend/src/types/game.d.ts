@@ -1,4 +1,4 @@
-import { Card }  from "../game/shared/cards";
+import { Card } from "../game/shared/cards";
 
 type Player = {
   id: string,
@@ -10,10 +10,12 @@ type Player = {
 }
 
 type CurrentGameState = {
-  players: string[],
+  players: Player[],
   deck: Card[],
   pile: Card[],
   currentTurn: string,
+  lastPlayed: Card[],
+  gameType: "sam" | "phom",
   phase: "waiting" | "playing" | "finish",
   instantWinPlayers: string[]
 }

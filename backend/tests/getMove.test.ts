@@ -1,6 +1,6 @@
-import {Suit, Card, shuffleDeck, dealCards} from "../src/game/shared/cards";
+import { Card, Suit } from "../src/game/shared/cards";
 
-import {MoveType, getMoveType, validateMove} from "../src/game/sam/rules";
+import { getMoveType, MoveType } from "../src/game/sam/rules/validateMove";
 
 describe("getMoveType test", () => {
   test("Move type: Single", () => {

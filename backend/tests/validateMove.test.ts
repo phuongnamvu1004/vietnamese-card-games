@@ -1,5 +1,5 @@
-import {Card, Suit} from "../src/game/shared/cards";
-import {validateMove} from "../src/game/sam/rules";
+import { Card, Suit } from "../src/game/shared/cards";
+import { validateMove } from "../src/game/sam/rules/validateMove";
 
 describe("validateMove test", () => {
   test("Validate move: Single", () => {
