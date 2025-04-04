@@ -1,8 +1,7 @@
-import {supabase} from "../database/db";
-import {log} from "../lib/utils";
+import { supabase } from "../database/db";
+import { log } from "../lib/utils";
 
 export interface UserStatisticsSam {
-  id: number;
   userId: number;
   totalGames: number;
   totalWins: number;
@@ -19,7 +18,6 @@ export interface UserStatisticsSam {
 }
 
 export interface UserStatisticsPhom {
-  id: number;
   userId: number;
   totalGames: number;
   totalWins: number;
@@ -34,7 +32,6 @@ export interface UserStatisticsPhom {
 }
 
 export const mapUserStatisticsSam = (data: any): UserStatisticsSam => ({
-  id: data.id,
   userId: data.user_id,
   totalGames: data.total_games,
   totalWins: data.total_wins,
@@ -51,7 +48,6 @@ export const mapUserStatisticsSam = (data: any): UserStatisticsSam => ({
 });
 
 export const mapUserStatisticsPhom = (data: any): UserStatisticsPhom => ({
-  id: data.id,
   userId: data.user_id,
   totalGames: data.total_games,
   totalWins: data.total_wins,
@@ -66,7 +62,7 @@ export const mapUserStatisticsPhom = (data: any): UserStatisticsPhom => ({
 });
 
 export const getUserStatisticsSamByUserId = async (userId: number) => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("user_statistics_sam")
     .select("*")
     .eq("user_id", userId)
@@ -77,11 +73,13 @@ export const getUserStatisticsSamByUserId = async (userId: number) => {
     return null;
   }
 
+  log("getUserStatisticsSamByUserId:", mapUserStatisticsSam(data), "info");
+
   return mapUserStatisticsSam(data);
 }
 
 export const getUserStatisticsPhomByUserId = async (userId: number) => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("user_statistics_phom")
     .select("*")
     .eq("user_id", userId)
@@ -92,7 +90,63 @@ export const getUserStatisticsPhomByUserId = async (userId: number) => {
     return null;
   }
 
+  log("getUserStatisticsPhomByUserId:", mapUserStatisticsPhom(data), "info");
+
   return mapUserStatisticsPhom(data);
+}
+
+export const initializeUserStatisticsSam = async (userId: number) => {
+  const {data, error} = await supabase
+    .from("user_statistics_sam")
+    .insert([
+      {
+        user_id: userId,
+        total_games: 0,
+        total_wins: 0,
+        instant_wins: {
+          dragonStraight: 0,
+          fourTwos: 0,
+          flushHand: 0,
+          threeTriplets: 0,
+          fivePairs: 0,
+        },
+        win_rate: 0,
+      }
+    ])
+    .select()
+    .single();
+
+  if (error || !data) {
+    log("initializeUserStatisticsSam error:", error?.message, error?.details, "error");
+  }
+
+  log("initializeUserStatisticsSam:", data, "info");
+}
+
+export const initializeUserStatisticsPhom = async (userId: number) => {
+  const {data, error} = await supabase
+    .from("user_statistics_phom")
+    .insert([
+      {
+        user_id: userId,
+        total_games: 0,
+        total_wins: 0,
+        instant_wins: {
+          regular: 0,
+          allCard: 0,
+          allOdds: 0,
+        },
+        win_rate: 0,
+      }
+    ])
+    .select()
+    .single();
+
+  if (error || !data) {
+    log("initializeUserStatisticsPhom error:", error?.message, error?.details, "error");
+  }
+
+  log("initializeUserStatisticsPhom:", data, "info");
 }
 
 export const updateUserStatisticsSam = async () => {
