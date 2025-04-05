@@ -1,16 +1,15 @@
 import { CurrentGameState } from '../../types/game';
-import { validateMove } from './rules';
+import { validateMove } from './rules/validateMove';
 import { Card } from "../shared/cards";
-import { log } from "../../lib/utils";
 
 export function playCard(gameState: CurrentGameState, playerId: string, cards: Card[]): CurrentGameState | null {
   // Find the
-  const player = gameState.players.find(p => p.id === playerId);
+  // const player = gameState.players.find(p => p.id === playerId);
 
-  if (!player || !player.hand.includes(cards)) {
-    log("Invalid player or card", "error")
-    throw new Error('Invalid player or card');
-  }
+  // if (!player || !player.hand.includes(cards)) {
+  //   log("Invalid player or card", "error")
+  //   throw new Error('Invalid player or card');
+  // }
 
   // // 1. Validate move
   const lastPlayed = gameState.lastPlayed || null;

@@ -3,14 +3,14 @@ import { connectDB } from "./database/db";
 import cookieParser from "cookie-parser";
 import { log } from "./lib/utils";
 import { config } from "dotenv";
-config({ path: ".env.local" });
-
 import authRouter from "./routes/auth.routes"
 import userRouter from "./routes/user.routes"
 
+config({path: ".env.local"});
+
 const app = express()
 
-connectDB();
+await connectDB();
 
 // Middleware to parse JSON
 app.use(express.json());

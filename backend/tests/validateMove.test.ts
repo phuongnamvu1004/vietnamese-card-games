@@ -1,284 +1,273 @@
 import { Card, Suit } from "../src/game/shared/cards";
-import { validateMove } from "../src/game/sam/rules/validateMove";
+import { MoveStatus, validateMove } from "../src/game/sam/rules/validateMove";
 
 describe("validateMove test", () => {
   test("Validate move: Single", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 13);
+    const prevCards = [new Card(Suit.Heart, 12)];
+    const move = [new Card(Suit.Spade, 13)];
 
-    const prevCards = [card1];
-    const move = [card2];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Single: False case", () => {
-    const card1 = new Card(Suit.Heart, 13);
-    const card2 = new Card(Suit.Spade, 12);
-
-    const prevCards = [card1];
-    const move = [card2];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID); // temporarily set currentHand === move
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Single with two", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 2);
+    const prevCards = [new Card(Suit.Heart, 12)];
+    const move = [new Card(Suit.Spade, 2)];
 
-    const prevCards = [card1];
-    const move = [card2];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
-  test("Validate move: Single with two: False case", () => {
-    const card1 = new Card(Suit.Heart, 2);
-    const card2 = new Card(Suit.Spade, 12);
+  test("Validate move: Single with must-beat", () => {
+    const prevCards = [new Card(Suit.Heart, 3)];
+    const move1 = [new Card(Suit.Spade, 12)];
+    const move2 = [new Card(Suit.Spade, 10)];
+    const currentHand = [
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 10),
+      new Card(Suit.Diamond, 9),
+      new Card(Suit.Heart, 8)
+    ];
 
-    const prevCards = [card1];
-    const move = [card2];
+    expect(validateMove(prevCards, move1, currentHand, true)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards, move2, currentHand, true)).toEqual(MoveStatus.INVALID);
+  })
 
-    expect(validateMove(prevCards, move)).toEqual(false);
+  test("Validate move: Single with must-beat with 2", () => {
+    const prevCards = [new Card(Suit.Heart, 3)];
+    const move1 = [new Card(Suit.Spade, 2)];
+    const move2 = [new Card(Suit.Spade, 10)];
+    const currentHand = [
+      new Card(Suit.Spade, 2),
+      new Card(Suit.Club, 10),
+      new Card(Suit.Diamond, 9),
+      new Card(Suit.Heart, 8)
+    ];
+
+    expect(validateMove(prevCards, move1, currentHand, true)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards, move2, currentHand, true)).toEqual(MoveStatus.INVALID);
+  })
+
+  test("Validate move: Single with must-beat with Ace", () => {
+    const prevCards = [new Card(Suit.Heart, 3)];
+    const move1 = [new Card(Suit.Spade, 1)];
+    const move2 = [new Card(Suit.Spade, 10)];
+    const currentHand = [
+      new Card(Suit.Spade, 1),
+      new Card(Suit.Club, 10),
+      new Card(Suit.Diamond, 9),
+      new Card(Suit.Heart, 8)
+    ];
+
+    expect(validateMove(prevCards, move1, currentHand, true)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards, move2, currentHand, true)).toEqual(MoveStatus.INVALID);
+  })
+
+  test("Validate move: Single with must-beat with Ace and Two", () => {
+    const prevCards = [new Card(Suit.Heart, 3)];
+    const move1 = [new Card(Suit.Club, 2)];
+    const move2 = [new Card(Suit.Spade, 1)];
+    const currentHand = [
+      new Card(Suit.Spade, 1),
+      new Card(Suit.Club, 2),
+      new Card(Suit.Diamond, 9),
+      new Card(Suit.Heart, 8)
+    ];
+
+    expect(validateMove(prevCards, move1, currentHand, true)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards, move2, currentHand, true)).toEqual(MoveStatus.INVALID);
+  })
+
+  test("Validate move: Other Types with must-beat", () => {
+    const prevCards = [new Card(Suit.Heart, 3), new Card(Suit.Spade, 3)];
+    const move1 = [new Card(Suit.Spade, 12), new Card(Suit.Club, 12)];
+    const move2 = [new Card(Suit.Club, 12)];
+    const currentHand = [
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 12),
+      new Card(Suit.Club, 11),
+      new Card(Suit.Heart, 8)
+    ];
+
+    expect(validateMove(prevCards, move1, currentHand, true)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards, move2, currentHand, true)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Double", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 12);
+    const prevCards1 = [new Card(Suit.Heart, 12), new Card(Suit.Spade, 12)];
+    const move1 = [new Card(Suit.Heart, 13), new Card(Suit.Spade, 13)];
+    const move1_false = [new Card(Suit.Heart, 12), new Card(Suit.Spade, 13)];
 
-    const card3 = new Card(Suit.Heart, 13);
-    const card4 = new Card(Suit.Spade, 13);
+    const prevCards2 = [new Card(Suit.Heart, 13), new Card(Suit.Spade, 13)];
+    const move2 = [new Card(Suit.Heart, 12), new Card(Suit.Spade, 12)];
 
-    const prevCards = [card1, card2];
-    const move = [card3, card4];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Double: False case", () => {
-    const card1 = new Card(Suit.Heart, 13);
-    const card2 = new Card(Suit.Spade, 13);
-
-    const card3 = new Card(Suit.Heart, 12);
-    const card4 = new Card(Suit.Spade, 12);
-
-    const prevCards = [card1, card2];
-    const move = [card3, card4];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards1, move1, move1, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards2, move2, move2, false)).toEqual(MoveStatus.INVALID);
+    expect(validateMove(prevCards1, move1_false, move1_false, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Double with twos", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 12);
+    const prevCards = [new Card(Suit.Heart, 12), new Card(Suit.Spade, 12)];
+    const move = [new Card(Suit.Heart, 2), new Card(Suit.Spade, 2)];
 
-    const card3 = new Card(Suit.Heart, 2);
-    const card4 = new Card(Suit.Spade, 2);
-
-    const prevCards = [card1, card2];
-    const move = [card3, card4];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
-  test("Validate move: Double with twos: False case", () => {
-    const card1 = new Card(Suit.Heart, 2);
-    const card2 = new Card(Suit.Spade, 2);
-
-    const card3 = new Card(Suit.Heart, 12);
-    const card4 = new Card(Suit.Spade, 12);
-
-    const prevCards = [card1, card2];
-    const move = [card3, card4];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
-  })
 
   test("Validate move: Triplet", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 12);
-    const card3 = new Card(Suit.Club, 12);
+    const prevCards = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 12)
+    ];
+    const move = [
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 13),
+      new Card(Suit.Club, 13)
+    ];
 
-    const card4 = new Card(Suit.Heart, 13);
-    const card5 = new Card(Suit.Spade, 13);
-    const card6 = new Card(Suit.Club, 13);
 
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Triplet: False case", () => {
-    const card1 = new Card(Suit.Heart, 13);
-    const card2 = new Card(Suit.Spade, 13);
-    const card3 = new Card(Suit.Club, 13);
-
-    const card4 = new Card(Suit.Heart, 12);
-    const card5 = new Card(Suit.Spade, 12);
-    const card6 = new Card(Suit.Club, 12);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Triplet with twos", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 12);
-    const card3 = new Card(Suit.Club, 12);
+    const prevCards = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 12)
+    ];
+    const move = [
+      new Card(Suit.Heart, 2),
+      new Card(Suit.Spade, 2),
+      new Card(Suit.Club, 2)
+    ];
 
-    const card4 = new Card(Suit.Heart, 2);
-    const card5 = new Card(Suit.Spade, 2);
-    const card6 = new Card(Suit.Club, 2);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Triplet with twos: False case", () => {
-    const card1 = new Card(Suit.Heart, 2);
-    const card2 = new Card(Suit.Spade, 2);
-    const card3 = new Card(Suit.Club, 2);
-
-    const card4 = new Card(Suit.Heart, 12);
-    const card5 = new Card(Suit.Spade, 12);
-    const card6 = new Card(Suit.Club, 12);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Quadruplet", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 12);
-    const card3 = new Card(Suit.Club, 12);
-    const card4 = new Card(Suit.Diamond, 12);
+    const prevCards = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 12),
+      new Card(Suit.Diamond, 12)
+    ];
+    const move = [
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 13),
+      new Card(Suit.Club, 13),
+      new Card(Suit.Diamond, 13)
+    ];
 
-    const card5 = new Card(Suit.Heart, 13);
-    const card6 = new Card(Suit.Spade, 13);
-    const card7 = new Card(Suit.Club, 13);
-    const card8 = new Card(Suit.Diamond, 13);
-
-
-    const prevCards = [card1, card2, card3, card4];
-    const move = [card5, card6, card7, card8];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Quadruplet: False case", () => {
-    const card1 = new Card(Suit.Heart, 13);
-    const card2 = new Card(Suit.Spade, 13);
-    const card3 = new Card(Suit.Club, 13);
-    const card4 = new Card(Suit.Diamond, 13);
-
-    const card5 = new Card(Suit.Heart, 12);
-    const card6 = new Card(Suit.Spade, 12);
-    const card7 = new Card(Suit.Club, 12);
-    const card8 = new Card(Suit.Diamond, 12);
-
-
-    const prevCards = [card1, card2, card3, card4];
-    const move = [card5, card6, card7, card8];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(move, prevCards, prevCards, false)).toEqual(MoveStatus.INVALID);
   })
 
   // No need to check for quadruplet with twos since four twos will be instant win
   test("Validate move: Quadruplet stop two", () => {
-    const card1 = new Card(Suit.Heart, 2);
+    const prevCards = [new Card(Suit.Heart, 2)];
+    const move = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 12),
+      new Card(Suit.Club, 12),
+      new Card(Suit.Diamond, 12)
+    ];
 
-    const card2 = new Card(Suit.Heart, 12);
-    const card3 = new Card(Suit.Spade, 12);
-    const card4 = new Card(Suit.Club, 12);
-    const card5 = new Card(Suit.Diamond, 12);
-
-    const prevCards = [card1];
-    const move = [card2, card3, card4, card5];
-
-    expect(validateMove(prevCards, move)).toEqual("quadrupletStopTwo");
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.QUADRUPLET_STOP_TWO);
   })
 
   test("Validate move: Straight", () => {
-    const card1 = new Card(Suit.Heart, 2);
-    const card2 = new Card(Suit.Heart, 3);
-    const card3 = new Card(Suit.Spade, 4);
+    const prevCards = [
+      new Card(Suit.Heart, 2),
+      new Card(Suit.Heart, 3),
+      new Card(Suit.Spade, 4)
+    ];
+    const move = [
+      new Card(Suit.Club, 3),
+      new Card(Suit.Diamond, 4),
+      new Card(Suit.Diamond, 5)
+    ];
 
-    const card4 = new Card(Suit.Club, 3);
-    const card5 = new Card(Suit.Diamond, 4);
-    const card6 = new Card(Suit.Diamond, 5);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.VALID);
   })
 
   test("Validate move: Straight edge case: Containing Ace", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Heart, 2);
-    const card3 = new Card(Suit.Spade, 3);
+    const prevCards1 = [
+      new Card(Suit.Heart, 1),
+      new Card(Suit.Heart, 2),
+      new Card(Suit.Spade, 3)
+    ];
+    const prevCards2 = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 1)
+    ];
+    const move = [
+      new Card(Suit.Club, 3),
+      new Card(Suit.Diamond, 4),
+      new Card(Suit.Diamond, 5)
+    ];
 
-    const card4 = new Card(Suit.Club, 3);
-    const card5 = new Card(Suit.Diamond, 4);
-    const card6 = new Card(Suit.Diamond, 5);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(true);
-  })
-
-  test("Validate move: Straight edge case: Straight ends with Ace: False case", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Heart, 13);
-    const card3 = new Card(Suit.Spade, 1);
-
-    const card4 = new Card(Suit.Club, 3);
-    const card5 = new Card(Suit.Diamond, 4);
-    const card6 = new Card(Suit.Diamond, 5);
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards1, move, move, false)).toEqual(MoveStatus.VALID);
+    expect(validateMove(prevCards2, move, move, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Invalid current move", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Heart, 13);
-    const card3 = new Card(Suit.Spade, 1);
+    const prevCards = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 1)
+    ];
+    // Invalid double
+    const move1 = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Heart, 13),
+    ]
 
-    const card4 = new Card(Suit.Club, 3);
-    const card5 = new Card(Suit.Diamond, 4);
-    const card6 = new Card(Suit.Diamond, 6);
+    // Invalid triplet
+    const move2 = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 13)
+    ]
 
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6];
+    // Invalid quadruplet
+    const move3 = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Heart, 13),
+      new Card(Suit.Spade, 13),
+      new Card(Suit.Club, 13)
+    ]
 
-    expect(validateMove(prevCards, move)).toEqual(false);
+    // Invalid straight
+    const move4 = [
+      new Card(Suit.Club, 3),
+      new Card(Suit.Diamond, 4),
+      new Card(Suit.Diamond, 6)
+    ];
+
+    expect(validateMove(prevCards, move1, move1, false)).toEqual(MoveStatus.INVALID);
+    expect(validateMove(prevCards, move2, move2, false)).toEqual(MoveStatus.INVALID);
+    expect(validateMove(prevCards, move3, move3, false)).toEqual(MoveStatus.INVALID);
+    expect(validateMove(prevCards, move4, move4, false)).toEqual(MoveStatus.INVALID);
   })
 
   test("Validate move: Straight of different length: False case", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Heart, 2);
-    const card3 = new Card(Suit.Spade, 3);
+    const prevCards = [
+      new Card(Suit.Heart, 1),
+      new Card(Suit.Heart, 2),
+      new Card(Suit.Spade, 3)
+    ];
+    const move = [
+      new Card(Suit.Club, 3),
+      new Card(Suit.Diamond, 4),
+      new Card(Suit.Diamond, 5),
+      new Card(Suit.Diamond, 6)
+    ];
 
-    const card4 = new Card(Suit.Club, 3);
-    const card5 = new Card(Suit.Diamond, 4);
-    const card6 = new Card(Suit.Diamond, 5);
-    const card7 = new Card(Suit.Diamond, 6);
-
-
-    const prevCards = [card1, card2, card3];
-    const move = [card4, card5, card6, card7];
-
-    expect(validateMove(prevCards, move)).toEqual(false);
+    expect(validateMove(prevCards, move, move, false)).toEqual(MoveStatus.INVALID);
   })
 })
