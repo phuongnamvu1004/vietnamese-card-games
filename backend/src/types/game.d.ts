@@ -9,16 +9,27 @@ type Player = {
   state: "instantWin" | "waitingForTurn" | "inTurn"
 }
 
-type CurrentGameState = {
+type BaseGameState = {
   players: Player[],
   deck: Card[],
   pile: Card[],
   currentTurn: string,
   lastPlayed: Card[],
-  gameType: "sam" | "phom",
   phase: "waiting" | "playing" | "finish",
+}
+
+type SamGameState = BaseGameState & {
+  nextPlayerStatus: "regular" | "mustBeat",
   instantWinPlayers: string[]
 }
+
+type PhomGameState = BaseGameState & {
+  gameType: "phom",
+  phomSpecificField: any // Replace with real fields for phom
+}
+
+type CurrentGameState = SamGameState | PhomGameState;
+
 
 type GameLog = {
   playerId: string,
