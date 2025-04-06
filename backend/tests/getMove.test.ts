@@ -4,8 +4,7 @@ import { getMoveType, MoveType } from "../src/game/sam/rules/validateMove";
 
 describe("getMoveType test", () => {
   test("Move type: Single", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const cards: Card[] = [card1];
+    const cards: Card[] = [new Card(Suit.Heart, 1)];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.SINGLE,
@@ -14,9 +13,7 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Double", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Spade, 1);
-    const cards: Card[] = [card1, card2];
+    const cards: Card[] = [new Card(Suit.Heart, 1), new Card(Suit.Spade, 1)];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.DOUBLE,
@@ -25,10 +22,11 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Triplet", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Spade, 1);
-    const card3 = new Card(Suit.Club, 1);
-    const cards: Card[] = [card1, card2, card3];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 1),
+      new Card(Suit.Spade, 1),
+      new Card(Suit.Club, 1)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.TRIPLET,
@@ -37,11 +35,12 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Quadruplet", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Spade, 1);
-    const card3 = new Card(Suit.Club, 1);
-    const card4 = new Card(Suit.Diamond, 1);
-    const cards: Card[] = [card1, card2, card3, card4];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 1),
+      new Card(Suit.Spade, 1),
+      new Card(Suit.Club, 1),
+      new Card(Suit.Diamond, 1)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.QUADRUPLET,
@@ -50,10 +49,11 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Straight: Regular Straight-3", () => {
-    const card1 = new Card(Suit.Heart, 4);
-    const card2 = new Card(Suit.Spade, 5);
-    const card3 = new Card(Suit.Club, 6);
-    const cards: Card[] = [card1, card2, card3];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 4),
+      new Card(Suit.Spade, 5),
+      new Card(Suit.Club, 6)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.STRAIGHT,
@@ -63,15 +63,16 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Straight: Regular Straight-8", () => {
-    const card1 = new Card(Suit.Heart, 4);
-    const card2 = new Card(Suit.Spade, 5);
-    const card3 = new Card(Suit.Club, 6);
-    const card4 = new Card(Suit.Diamond, 7);
-    const card5 = new Card(Suit.Heart, 8);
-    const card6 = new Card(Suit.Spade, 9);
-    const card7 = new Card(Suit.Club, 10);
-    const card8 = new Card(Suit.Diamond, 11);
-    const cards: Card[] = [card1, card2, card3, card4, card5, card6, card7, card8];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 4),
+      new Card(Suit.Spade, 5),
+      new Card(Suit.Club, 6),
+      new Card(Suit.Diamond, 7),
+      new Card(Suit.Heart, 8),
+      new Card(Suit.Spade, 9),
+      new Card(Suit.Club, 10),
+      new Card(Suit.Diamond, 11),
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.STRAIGHT,
@@ -81,11 +82,11 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Straight: Edge case straight from A", () => {
-    const card1 = new Card(Suit.Heart, 1);
-    const card2 = new Card(Suit.Spade, 2);
-    const card3 = new Card(Suit.Club, 3);
-
-    const cards: Card[] = [card1, card2, card3];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 1),
+      new Card(Suit.Spade, 2),
+      new Card(Suit.Club, 3)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.STRAIGHT,
@@ -95,11 +96,11 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Straight: Edge case straight to A", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 13);
-    const card3 = new Card(Suit.Club, 1);
-
-    const cards: Card[] = [card1, card2, card3];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 13),
+      new Card(Suit.Club, 1)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.STRAIGHT,
@@ -109,11 +110,11 @@ describe("getMoveType test", () => {
   })
 
   test("Move type: Straight: Invalid sequence", () => {
-    const card1 = new Card(Suit.Heart, 12);
-    const card2 = new Card(Suit.Spade, 13);
-    const card3 = new Card(Suit.Club, 2);
-
-    const cards: Card[] = [card1, card2, card3];
+    const cards: Card[] = [
+      new Card(Suit.Heart, 12),
+      new Card(Suit.Spade, 13),
+      new Card(Suit.Club, 2)
+    ];
 
     expect(getMoveType(cards)).toEqual({
       type: MoveType.INVALID,

@@ -30,7 +30,6 @@ type PhomGameState = BaseGameState & {
 
 type CurrentGameState = SamGameState | PhomGameState;
 
-
 type GameLog = {
   playerId: string,
   action: "draw" | "play" | "discard" | "instantWin",

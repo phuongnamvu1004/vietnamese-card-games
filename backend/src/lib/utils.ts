@@ -2,10 +2,10 @@ import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 import { Response } from "express";
 
-config({ path: ".env.local" });
+config({path: ".env.local"});
 
 export const generateToken = (userId: string, res: Response) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({userId}, process.env.JWT_SECRET!, {
     expiresIn: "7d",
   });
 
@@ -18,6 +18,15 @@ export const generateToken = (userId: string, res: Response) => {
 
   return token;
 };
+
+export const generateRoomId = (length: number = 8): string => {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // clearer characters
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 export const log = (...args: any[]): void => {
   const messages = args.length > 1 ? args.slice(0, args.length - 1) : args;

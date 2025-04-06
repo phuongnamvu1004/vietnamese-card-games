@@ -4,7 +4,6 @@ import cloudinary from "../lib/cloudinary";
 import { updateUserProfilePic } from "../models/user.model";
 import { getUserStatisticsPhomByUserId, getUserStatisticsSamByUserId } from "../models/userStatistics.model";
 
-
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const {profilePic} = req.body;
