@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { nanoid } from 'nanoid';
-import Room from '../models/room.model';
+import { Room } from '../models/room.model';
 import { Card, shuffleDeck } from '../game/shared/cards';
 import { getGameState, updateGameState } from '../redis/gameState';
 import type { CurrentGameState, Player } from '../types/game';
@@ -9,7 +9,7 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
   /**
    * CREATE ROOM
    */
-  socket.on('createRoom', async ({ hostUserId, gameType, maxPlayers, otherPlayers, buyIn, valuePerPoint }, callback) => {
+  socket.on('createRoom', async ({hostUserId, gameType, maxPlayers, otherPlayers, buyIn, valuePerPoint}, callback) => {
     try {
       const roomId = nanoid(8); // short room code like "X3P9F2GQ"
 
@@ -51,17 +51,17 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
       await updateGameState(roomId, initialState, playerList);
 
       // 3. Return roomId to client
-      callback({ roomId });
+      callback({roomId});
     } catch (err) {
       console.error('createRoom error:', err);
-      callback({ error: 'Failed to create room' });
+      callback({error: 'Failed to create room'});
     }
   });
 
   /**
    * JOIN ROOM
    */
-  socket.on('joinRoom', async ({ roomId, userId, playerName }, callback) => {
+  socket.on('joinRoom', async ({roomId, userId, playerName}, callback) => {
     try {
       socket.join(roomId);
 
@@ -70,7 +70,7 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
 
       // 2. Check room status
       if (!gameState) {
-        callback({ error: 'Room not found or expired' });
+        callback({error: 'Room not found or expired'});
         return;
       }
 
@@ -96,10 +96,10 @@ export const setupRoomEvents = (io: Server, socket: Socket) => {
       io.to(roomId).emit('roomUpdate', gameState);
 
       // 5. Respond to joining player
-      callback({ success: true });
+      callback({success: true});
     } catch (err) {
       console.error('joinRoom error:', err);
-      callback({ error: 'Failed to join room' });
+      callback({error: 'Failed to join room'});
     }
   });
 };
