@@ -22,6 +22,8 @@ export const getMoveType = (cards: Card[]) => {
   let cardRankDict: Record<number, number> = {}
   const length = cards.length;
 
+  // { 2: 1, 3: 2, 4: 1 }
+
   for (const card of cards) {
     cardRankDict[card.getRank] = (cardRankDict[card.getRank] || 0) + 1;
   }
