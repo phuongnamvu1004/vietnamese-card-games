@@ -120,5 +120,7 @@ describe("getMoveType test", () => {
       type: MoveType.INVALID,
     });
   })
+
+
 })
 

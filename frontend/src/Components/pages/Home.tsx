@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface HomeProps {
   onEnter?: () => void;
 }
 
-const Home: React.FC<HomeProps> = ({onEnter}) => {
+const Home: React.FC<HomeProps> = ({}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

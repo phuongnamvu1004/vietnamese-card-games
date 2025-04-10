@@ -1,5 +1,4 @@
 import { CurrentGameState } from '../../types/game';
-import { validateMove } from './rules/validateMove';
 import { Card } from "../shared/cards";
 
 export function playCard(gameState: CurrentGameState, playerId: string, move: Card[], currentHand: Card[]): CurrentGameState | null {
@@ -13,7 +12,7 @@ export function playCard(gameState: CurrentGameState, playerId: string, move: Ca
 
   // // 1. Validate move
   const lastPlayed = gameState.lastPlayed || null;
-  if (!validateMove(move, lastPlayed, currentHand,)) throw new Error('Invalid move');
+  // if (!validateMove(move, lastPlayed, currentHand,)) throw new Error('Invalid move');
 
   // // 2. Apply move
   // player.hand = player.hand.filter(c => c !== card);
