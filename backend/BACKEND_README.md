@@ -1,5 +1,7 @@
 ## Schemas
+
 - User schema
+
 ```ts
 type User = {
   id: string,
@@ -23,7 +25,8 @@ type User = {
 }
 ```
 
-- Card/deck schema
+- CardDisplay/deck schema
+
 ```ts
 export enum Suit {
   Spade = "spade",
@@ -32,11 +35,11 @@ export enum Suit {
   Heart = "heart"
 }
 
-export class Card {
+export class CardDisplay {
   constructor(public suit: Suit, public rank: number) {}
 
   toString(): string {
-    const rankStr = Card.rankToString(this.rank);
+    const rankStr = CardDisplay.rankToString(this.rank);
     return `${rankStr}${this.suit}`;
   }
 
@@ -50,13 +53,13 @@ export class Card {
     return faceCards[rank] || rank.toString();
   }
 
-  static createDeck(): Card[] {
+  static createDeck(): CardDisplay[] {
     const suits = Object.values(Suit);
-    const deck: Card[] = [];
+    const deck: CardDisplay[] = [];
 
     for (const suit of suits) {
       for (let rank = 1; rank <= 13; rank++) {
-        deck.push(new Card(suit, rank));
+        deck.push(new CardDisplay(suit, rank));
       }
     }
 
@@ -64,7 +67,7 @@ export class Card {
   }
 }
 
-export function shuffleDeck(deck: Card[]): Card[] {
+export function shuffleDeck(deck: CardDisplay[]): CardDisplay[] {
   const shuffled = [...deck];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -73,8 +76,8 @@ export function shuffleDeck(deck: Card[]): Card[] {
   return shuffled;
 }
 
-export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: number): Card[][] {
-  const hands: Card[][] = Array.from({ length: numPlayers }, () => []);
+export function dealCards(deck: CardDisplay[], numPlayers: number, cardsPerPlayer: number): CardDisplay[][] {
+  const hands: CardDisplay[][] = Array.from({ length: numPlayers }, () => []);
 
   for (let i = 0; i < cardsPerPlayer; i++) {
     for (let p = 0; p < numPlayers; p++) {
@@ -88,12 +91,13 @@ export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: numb
 
 ```
 
-- In-game instances 
+- In-game instances
+
 ```ts
 type Player = {
   id: string,
   socketId: string,
-  hand: Card[],
+  hand: CardDisplay[],
   buyIn: number,
   state: "instantWin" | "waitingForTurn" | "inTurn"
 }
@@ -101,8 +105,8 @@ type Player = {
 type GameState = {
   roomId: string, // the 6-digit unique identifier for room
   players: Player[],
-  deck: Card[], // current cards left in deck both before and after dealing
-  pile: Card[], // played cards
+  deck: CardDisplay[], // current cards left in deck both before and after dealing
+  pile: CardDisplay[], // played cards
   currentTurn: string, // socketId or userId
   // waiting is for before the started (player not ready?)
   // playing is marked by after dealing the cards 
@@ -113,7 +117,8 @@ type GameState = {
 ```
 
 - Rules schemas
-**Sam's rules**
+  **Sam's rules**
+
 ```ts
 enum Move {
   pass = "pass",
@@ -135,7 +140,7 @@ class RoundType {
   }
 
   // for straight only, check for higher straight
-  static isHigherStraight(current: Card[], previous: Card[]): boolean {
+  static isHigherStraight(current: CardDisplay[], previous: CardDisplay[]): boolean {
     const currentRanks = current.map(card => card.rank).sort((a, b) => a - b);
     const previousRanks = previous.map(card => card.rank).sort((a, b) => a - b);
 
@@ -150,8 +155,8 @@ class RoundType {
 
 // Check for same RoundType first then compare the highest of element of prevPlayedCards and currentCards
 export const validateMove = (
-  prevPlayedCards: Card[], 
-  currentCards: Card[], 
+  prevPlayedCards: CardDisplay[], 
+  currentCards: CardDisplay[], 
   roundType?: RoundType
 ): boolean => {
   if (!roundType) {
@@ -170,7 +175,7 @@ export const validateMove = (
   return true; // Placeholder return value
 };
 
-function determineRoundType(cards: Card[]): RoundType | undefined {
+function determineRoundType(cards: CardDisplay[]): RoundType | undefined {
   // check for single
   if (cards.length === 1) {
     return RoundType.Single;

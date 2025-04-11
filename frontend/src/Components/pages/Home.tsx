@@ -16,7 +16,7 @@ const Home: React.FC<HomeProps> = ({}) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Card animation
+  // CardDisplay animation
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   // Chip animation
   const [hoveredChip, setHoveredChip] = useState<number | null>(null);
@@ -68,7 +68,7 @@ const Home: React.FC<HomeProps> = ({}) => {
       <div className="absolute top-0 w-full h-2 bg-cyan-500 shadow-[0_0_20px_5px_rgba(6,182,212,0.7)]"></div>
       <div className="absolute bottom-0 w-full h-2 bg-pink-500 shadow-[0_0_20px_5px_rgba(236,72,153,0.7)]"></div>
 
-      {/* Header with futuristic logo */}
+      {/* CyberpunkLayout with futuristic logo */}
       <div className="absolute top-8 w-full flex justify-center">
         <div className="text-center">
           <div

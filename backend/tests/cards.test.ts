@@ -1,7 +1,7 @@
 import { Suit, Card, shuffleDeck, dealCards } from "../src/game/shared/cards";
 
-describe("Card class test", () => {
-  test("Card creation + string representation + getRank", () => {
+describe("CardDisplay class test", () => {
+  test("CardDisplay creation + string representation + getRank", () => {
     const card = new Card(Suit.Heart, 1);
     expect(card.toString()).toBe("A of heart");
     expect(card.getRank).toBe(1);
@@ -32,7 +32,7 @@ describe("Card class test", () => {
     expect(hands[3].length).toBe(5);
   });
 
-  test("Deal cards with insufficient deck", () => { 
+  test("Deal cards with insufficient deck", () => {
     const deck = Card.createDeck();
     const shuffledDeck = shuffleDeck(deck);
     const hands = dealCards(shuffledDeck, 4, 20);
