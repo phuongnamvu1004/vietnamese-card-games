@@ -9,17 +9,21 @@ interface NeonButtonProps {
   fullWidth?: boolean;
   type?: 'button' | 'submit';
   disabled?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
 const NeonButton: React.FC<NeonButtonProps> = ({
-                                                 to,
-                                                 onClick,
-                                                 color = 'cyan',
-                                                 children,
-                                                 fullWidth = false,
-                                                 type = 'button',
-                                                 disabled = false
-                                               }) => {
+  to,
+  onClick,
+  color = 'cyan',
+  children,
+  fullWidth = false,
+  type = 'button',
+  disabled = false,
+  size = 'md',
+  className = '',
+}) => {
   const colorStyles = {
     cyan: {
       text: 'text-cyan-400',
@@ -41,11 +45,15 @@ const NeonButton: React.FC<NeonButtonProps> = ({
     }
   }[color];
 
+  const sizeStyles = {
+    sm: 'py-2 px-4 text-lg',
+    md: 'py-3 px-6 text-xl',
+    lg: 'py-5 px-8 text-2xl'
+  }[size];
+
   const widthClass = fullWidth ? 'w-full' : '';
+  const buttonClasses = `relative overflow-hidden ${sizeStyles} rounded-md bg-gray-900 text-center ${colorStyles.text} font-bold uppercase tracking-wider shadow-lg ${colorStyles.border} hover:text-white ${colorStyles.hoverShadow} transform hover:-translate-y-1 transition-all font-mono ${widthClass} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`;
 
-  const buttonClasses = `relative overflow-hidden py-3 px-6 rounded-md bg-gray-900 text-center ${colorStyles.text} text-xl font-bold uppercase tracking-wider shadow-lg ${colorStyles.border} hover:text-white ${colorStyles.hoverShadow} transform hover:-translate-y-1 transition-all font-mono ${widthClass} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
-
-  // Render link or button based on props
   if (to) {
     return (
       <Link to={to} className={buttonClasses}>
