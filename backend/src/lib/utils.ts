@@ -28,7 +28,7 @@ export const generateRoomId = (length: number = 8): string => {
   return result;
 }
 
-export const log = (...args: any[]): void => {
+export const log = (...args: [string | number]): void => {
   const messages = args.length > 1 ? args.slice(0, args.length - 1) : args;
   let level = args.length > 1 ? args[args.length - 1] || "info" : "info";
   level = typeof level === "string" ? level.toLowerCase() : "info";
