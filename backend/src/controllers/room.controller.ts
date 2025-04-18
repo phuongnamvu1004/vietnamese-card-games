@@ -74,7 +74,7 @@ export const joinRoom = async (req: Request, res: Response) => {
       return;
     }
 
-    const currentPlayers: String[] | null = await getPlayersFromRoom(room.id);
+    const currentPlayers: string[] | null = await getPlayersFromRoom(room.id);
     if (currentPlayers!.length == room.maxPlayers) {
       log("Room is full", "warn");
       res.status(400).json({message: "Room is full"});

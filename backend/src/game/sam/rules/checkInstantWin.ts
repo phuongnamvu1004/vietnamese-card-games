@@ -35,7 +35,7 @@ export const checkInstantWin = (cards: Card[]) => {
   }
 
   // To check for the collection types: fourTwos, threeTriplets, fivePairs => construct a dictionary
-  let cardRankDict: Record<number, number> = {}
+  const cardRankDict: Record<number, number> = {}
 
   for (const card of cards) {
     cardRankDict[card.getRank] = (cardRankDict[card.getRank] || 0) + 1;

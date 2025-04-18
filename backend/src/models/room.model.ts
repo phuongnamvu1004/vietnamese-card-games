@@ -140,7 +140,7 @@ export const findRoomByRoomId = async (roomId: string): Promise<Room | null> => 
   return mapRoomData(data);
 };
 
-export const getPlayersFromRoom = async (id: number): Promise<String[] | null> => {
+export const getPlayersFromRoom = async (id: number): Promise<string[] | null> => {
   const {data, error} = await supabase
     .from("rooms")
     .select("players")

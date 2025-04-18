@@ -19,7 +19,7 @@ export const getMoveType = (cards: Card[]) => {
   }
 
   // preprocessing to check for double, triplet and quadruplet
-  let cardRankDict: Record<number, number> = {}
+  const cardRankDict: Record<number, number> = {}
   const length = cards.length;
 
   // { 2: 1, 3: 2, 4: 1 }
