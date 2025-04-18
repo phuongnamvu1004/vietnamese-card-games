@@ -1,3 +1,7 @@
-export const setupGameEvents = (io: any, socket: any) => { 
-  return null;
-}
+import { Server, Socket } from "socket.io";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const setupGameEvents = (io: Server, socket: Socket): void => {
+  return;
+};
+

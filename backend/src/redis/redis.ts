@@ -1,13 +1,10 @@
-import {createClient} from "redis";
-import session from "express-session";
-import * as connectRedis from "connect-redis"; // Import everything
-
-import {config} from "dotenv";
-import {log} from "../lib/utils";
+import { createClient } from "redis";
+import { RedisStore } from "connect-redis"; // ✅ Named import
+import { config } from "dotenv";
+import { log } from "../lib/utils";
 
 config({path: ".env.local"});
 
-// Create Redis client
 const redisClient = createClient({
   url: process.env.REDIS_URL,
 });
@@ -20,16 +17,12 @@ redisClient.on("error", (err) => {
   log("Redis Client Error:", err, "error");
 });
 
-// Create a session store
-const initializeRedisStore = (client: ReturnType<typeof createClient>, prefix: string) => {
-  const getRedisStore = (connectRedis as any).default(session);
-  return new getRedisStore({client, prefix});
-};
-
+// ✅ Create and return session store
 export const createNewSessionStore = () => {
-  const sessionStore = initializeRedisStore(redisClient, "game-session:");
-  return sessionStore;
+  return new RedisStore({
+    client: redisClient,
+    prefix: "game-session:",
+  });
 };
-
 
 export default redisClient;

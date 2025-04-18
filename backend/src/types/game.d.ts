@@ -25,7 +25,7 @@ type SamGameState = BaseGameState & {
 
 type PhomGameState = BaseGameState & {
   gameType: "phom",
-  phomSpecificField: any // Replace with real fields for phom
+  phomSpecificField: undefined // Replace it with real fields for phom
 }
 
 type CurrentGameState = SamGameState | PhomGameState;

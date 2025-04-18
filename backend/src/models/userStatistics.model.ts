@@ -31,35 +31,36 @@ export interface UserStatisticsPhom {
   updatedAt: string;
 }
 
-export const mapUserStatisticsSam = (data: any): UserStatisticsSam => ({
-  userId: data.user_id,
-  totalGames: data.total_games,
-  totalWins: data.total_wins,
+export const mapUserStatisticsSam = (data: Record<string, unknown>): UserStatisticsSam => ({
+  userId: Number(data.user_id),
+  totalGames: Number(data.total_games),
+  totalWins: Number(data.total_wins),
   instantWins: {
-    dragonStraight: data.instant_wins?.dragonStraight ?? 0,
-    fourTwos: data.instant_wins?.fourTwos ?? 0,
-    flushHand: data.instant_wins?.flushHand ?? 0,
-    threeTriplets: data.instant_wins?.threeTriplets ?? 0,
-    fivePairs: data.instant_wins?.fivePairs ?? 0,
+    dragonStraight: Number((data.instant_wins as Record<string, unknown>)?.dragonStraight ?? 0),
+    fourTwos: Number((data.instant_wins as Record<string, unknown>)?.fourTwos ?? 0),
+    flushHand: Number((data.instant_wins as Record<string, unknown>)?.flushHand ?? 0),
+    threeTriplets: Number((data.instant_wins as Record<string, unknown>)?.threeTriplets ?? 0),
+    fivePairs: Number((data.instant_wins as Record<string, unknown>)?.fivePairs ?? 0),
   },
-  winRate: data.win_rate,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+  winRate: Number(data.win_rate),
+  createdAt: String(data.created_at),
+  updatedAt: String(data.updated_at),
 });
 
-export const mapUserStatisticsPhom = (data: any): UserStatisticsPhom => ({
-  userId: data.user_id,
-  totalGames: data.total_games,
-  totalWins: data.total_wins,
+export const mapUserStatisticsPhom = (data: Record<string, unknown>): UserStatisticsPhom => ({
+  userId: Number(data.user_id),
+  totalGames: Number(data.total_games),
+  totalWins: Number(data.total_wins),
   instantWins: {
-    regular: data.instant_wins?.regular ?? 0,
-    allCard: data.instant_wins?.allCard ?? 0,
-    allOdds: data.instant_wins?.allOdds ?? 0,
+    regular: Number((data.instant_wins as Record<string, unknown>)?.regular ?? 0),
+    allCard: Number((data.instant_wins as Record<string, unknown>)?.allCard ?? 0),
+    allOdds: Number((data.instant_wins as Record<string, unknown>)?.allOdds ?? 0),
   },
-  winRate: data.win_rate,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+  winRate: Number(data.win_rate),
+  createdAt: String(data.created_at),
+  updatedAt: String(data.updated_at),
 });
+
 
 export const getUserStatisticsSamByUserId = async (userId: number) => {
   const {data, error} = await supabase

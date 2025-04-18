@@ -14,24 +14,25 @@ export interface User {
 
 export type SafeUser = Omit<User, "password">;
 
-export const mapUserData = (data: any): User => ({
-  id: data.id,
-  email: data.email,
-  fullName: data.full_name,
-  password: data.password,
-  profilePic: data.profile_pic,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+export const mapUserData = (data: Record<string, unknown>): User => ({
+  id: Number(data.id),
+  email: String(data.email),
+  fullName: String(data.full_name),
+  password: String(data.password),
+  profilePic: typeof data.profile_pic === 'string' ? data.profile_pic : undefined,
+  createdAt: String(data.created_at),
+  updatedAt: String(data.updated_at),
 });
 
-export const mapSafeUserData = (data: any): SafeUser => ({
-  id: data.id,
-  email: data.email,
-  fullName: data.full_name,
-  profilePic: data.profile_pic,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+export const mapSafeUserData = (data: Record<string, unknown>): SafeUser => ({
+  id: Number(data.id),
+  email: String(data.email),
+  fullName: String(data.full_name),
+  profilePic: typeof data.profile_pic === 'string' ? data.profile_pic : undefined,
+  createdAt: String(data.created_at),
+  updatedAt: String(data.updated_at),
 });
+
 
 export const createUser = async (user: {
   email: string;
@@ -39,14 +40,14 @@ export const createUser = async (user: {
   password: string;
   profilePic?: string;
 }): Promise<SafeUser | null> => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("users")
     .insert([
       {
         email: user.email,
-        full_name: user.fullName,        
+        full_name: user.fullName,
         password: user.password,
-        profile_pic: user.profilePic || "" 
+        profile_pic: user.profilePic || ""
       }
     ])
     .select()
@@ -62,7 +63,7 @@ export const createUser = async (user: {
 
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("users")
     .select("*")
     .eq("email", email)
@@ -78,9 +79,9 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
 
 
 export const updateUserProfilePic = async (userId: number, profilePicUrl: string): Promise<SafeUser | null> => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("users")
-    .update({ profile_pic: profilePicUrl })
+    .update({profile_pic: profilePicUrl})
     .eq("id", userId)
     .select()
     .single();
@@ -92,7 +93,7 @@ export const updateUserProfilePic = async (userId: number, profilePicUrl: string
 
 
 export const getUserById = async (id: number): Promise<SafeUser | null> => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("users")
     .select("id, email, full_name, profile_pic, created_at, updated_at")
     .eq("id", id)

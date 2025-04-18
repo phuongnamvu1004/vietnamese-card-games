@@ -15,17 +15,17 @@ export interface Room {
   updatedAt: string;
 }
 
-export const mapRoomData = (data: any): Room => ({
-  id: data.id,
-  roomId: data.room_id,
-  hostUserId: data.host_user_id,
-  gameType: data.game_type,
-  maxPlayers: data.max_players,
-  players: data.players || [], // Map player_ids field and use an empty array as default
-  buyIn: data.buy_in,
-  valuePerPoint: data.valuePerPoint,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
+export const mapRoomData = (data: Record<string, unknown>): Room => ({
+  id: Number(data.id),
+  roomId: String(data.room_id),
+  hostUserId: Number(data.host_user_id),
+  gameType: data.game_type === 'phom' ? 'phom' : 'sam', // validate enum
+  maxPlayers: Number(data.max_players),
+  players: Array.isArray(data.players) ? data.players as number[] : [],
+  buyIn: Number(data.buy_in),
+  valuePerPoint: Number(data.value_per_point),
+  createdAt: String(data.created_at),
+  updatedAt: String(data.updated_at),
 });
 
 export interface RoomPlayer {
@@ -33,9 +33,9 @@ export interface RoomPlayer {
   userId: number;
 }
 
-export const mapRoomPlayerData = (data: any): RoomPlayer => ({
-  roomId: data.room_id,
-  userId: data.user_id,
+export const mapRoomPlayerData = (data: Record<string, unknown>): RoomPlayer => ({
+  roomId: Number(data.room_id),
+  userId: Number(data.user_id),
 });
 
 // export interface GameLogEntry {
@@ -44,7 +44,6 @@ export const mapRoomPlayerData = (data: any): RoomPlayer => ({
 //   action: string;
 //   timestamp: string;
 // }
-
 
 export const createRoom = async (room: {
   roomId: string;
@@ -90,6 +89,7 @@ export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
       }
     ])
     .select()
+    .single();
 
   if (error || !data) {
     log("createRoomPlayer error:", error?.message, error?.details, "error");
