@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createRoom, createRoomPlayer, findRoomByRoomId, getPlayersFromRoom, updateRoom } from "../models/room.model";
-import { generateRoomId, log } from "../lib/utils";
+import { generateRoomId, log, toError } from "../lib/utils";
 import { findUserByEmail } from "../models/user.model";
 
 export const createNewRoom = async (req: Request, res: Response) => {
@@ -56,9 +56,10 @@ export const createNewRoom = async (req: Request, res: Response) => {
     }
 
     res.status(201).json({message: "Room created successfully", roomId});
-  } catch (error: any) {
-    log("Error in createNewRoom controller: ", error.message || "Internal server error", "error")
-    res.status(500).json({message: error.message || "Internal server error"});
+  } catch (error: unknown) {
+    const err = toError(error);
+    log("Error in createNewRoom controller: ", err.message || "Internal server error", "error")
+    res.status(500).json({message: err.message || "Internal server error"});
   }
 };
 
@@ -96,9 +97,10 @@ export const joinRoom = async (req: Request, res: Response) => {
 
     log("Add user", req.user?.email, "to room:", room.id, "info")
     res.status(200).json({message: "Joined room successfully"});
-  } catch (error: any) {
-    log("Error in joinRoom controller: ", error.message || "Internal server error", "error");
-    res.status(500).json({message: error.message || "Internal server error"});
+  } catch (error: unknown) {
+    const err = toError(error);
+    log("Error in joinRoom controller: ", err.message || "Internal server error", "error");
+    res.status(500).json({message: err.message || "Internal server error"});
   }
 };
 
