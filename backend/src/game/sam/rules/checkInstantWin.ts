@@ -34,7 +34,7 @@ export const checkInstantWin = (cards: Card[]) => {
     return InstantWinType.DragonStraight;
   }
 
-  // To check for the collections types: fourTwos, threeTriplets, fivePairs => construct a dictionary
+  // To check for the collection types: fourTwos, threeTriplets, fivePairs => construct a dictionary
   let cardRankDict: Record<number, number> = {}
 
   for (const card of cards) {
@@ -46,7 +46,7 @@ export const checkInstantWin = (cards: Card[]) => {
     return InstantWinType.FourTwos;
   }
 
-  // check flush hand (in the middle of collections types to keep the priority in order)
+  // check flush hand (in the middle of collection types to keep the priority in order)
   const suits = cards.map(card => card.getSuit)
 
   const isFlush = () => {

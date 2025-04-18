@@ -1,5 +1,3 @@
-import type { Player } from '../types/game';
-
 import redisClient from "./redis"
 
 export const getGameState = async (roomId: string) => {
@@ -12,7 +10,7 @@ export const getGameState = async (roomId: string) => {
   return JSON.parse(gameState);
 }
 
-export const updateGameState = async (roomId: string, gameState: any, playerList: Player[]) => {
+export const updateGameState = async (roomId: string, gameState: any) => {
   // This function should update the game state in Redis
   // For example, using ioredis:
   await redisClient.set(`gameState:${roomId}`, JSON.stringify(gameState));
