@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createRoom, createRoomPlayer, findRoomByRoomId, getPlayersFromRoom, updateRoom } from "../models/room.model";
+import { createRoom, createRoomPlayer } from "../models/room.model";
 import { generateRoomId, log, toError } from "../lib/utils";
 import { findUserByEmail } from "../models/user.model";
 
@@ -62,45 +62,3 @@ export const createNewRoom = async (req: Request, res: Response) => {
     res.status(500).json({message: err.message || "Internal server error"});
   }
 };
-
-export const joinRoom = async (req: Request, res: Response) => {
-  try {
-    const {roomId} = req.body;
-    const userId = req.user!.id;
-
-    const room = await findRoomByRoomId(roomId); // assume you have this
-    if (!room) {
-      log("Room not found", "warn");
-      res.status(404).json({message: "Room not found"});
-      return;
-    }
-
-    const currentPlayers: string[] | null = await getPlayersFromRoom(room.id);
-    if (currentPlayers!.length == room.maxPlayers) {
-      log("Room is full", "warn");
-      res.status(400).json({message: "Room is full"});
-      return;
-    }
-
-    // Optionally check if user already joined
-    const alreadyJoined = currentPlayers!.find(p => p === req.user!.id.toString());
-    if (alreadyJoined) {
-      log("User already in the room", "warn");
-      res.status(400).json({message: "User already in the room"});
-      return;
-    }
-
-    room.players.push(userId);
-
-    await updateRoom(room);
-    await createRoomPlayer({roomId: room.id, userId});
-
-    log("Add user", req.user?.email, "to room:", room.id, "info")
-    res.status(200).json({message: "Joined room successfully"});
-  } catch (error: unknown) {
-    const err = toError(error);
-    log("Error in joinRoom controller: ", err.message || "Internal server error", "error");
-    res.status(500).json({message: err.message || "Internal server error"});
-  }
-};
-

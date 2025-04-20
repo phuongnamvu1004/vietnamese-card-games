@@ -6,6 +6,7 @@ type Player = {
   hand: Card[],
   buyIn: number,
   gameBalance: number,
+  mustBeat: boolean,
   state: "instantWin" | "waitingForTurn" | "inTurn"
 }
 
@@ -14,7 +15,7 @@ type BaseGameState = {
   deck: Card[],
   pile: Card[],
   currentTurn: string,
-  lastPlayed: Card[],
+  lastPlayed: { playerId: string, cards: Card[] },
   phase: "waiting" | "playing" | "finish",
 }
 

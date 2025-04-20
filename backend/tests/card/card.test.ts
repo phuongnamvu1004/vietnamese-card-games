@@ -1,4 +1,4 @@
-import { Suit, Card, shuffleDeck, dealCards } from "../src/game/shared/cards";
+import { Card, dealCards, shuffleDeck, Suit } from "../../src/game/shared/cards";
 
 describe("CardDisplay class test", () => {
   test("CardDisplay creation + string representation + getRank", () => {
