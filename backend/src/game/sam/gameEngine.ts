@@ -1,13 +1,13 @@
-import { CurrentGameState } from '../../types/game';
+import { CurrentGameState, Player } from '../../types/game';
 import { Card } from "../shared/cards";
 import { log } from "../../lib/utils";
 import { validateMove } from "./rules/validateMove";
 
-export function playCard(gameState: CurrentGameState, playerId: string, move: Card[], currentHand: Card[]): CurrentGameState | null {
+export const playCard = (gameState: CurrentGameState, socketId: string, move: Card[], currentHand: Card[]): CurrentGameState | null => {
   // Find the player currently playing
-  const player = gameState.players.find(p => p.id === playerId);
+  const player = gameState.players.find(p => p.socketId === socketId);
 
-  if (!player || !move.every(card => player.hand.includes(card))) {
+  if (!player) {
     log("Invalid player or card", "error")
     throw new Error('Invalid player or card');
   }
@@ -15,31 +15,37 @@ export function playCard(gameState: CurrentGameState, playerId: string, move: Ca
   // 1. Validate move
   const lastPlayed = gameState.lastPlayed || null;
 
+  // Validate the move
   if (!validateMove(lastPlayed?.cards, move, currentHand, player.mustBeat)) throw new Error('Invalid move');
 
   // 2. Apply move
+  // Remove played cards from player's hand
   for (const card of move) {
-    player.hand = player.hand.filter(c => c !== card);
+    player.hand = player.hand.filter(c => !c.equals(card));
   }
 
-  gameState.lastPlayed = {playerId: playerId, cards: move};
-  const nextPlayerId = getNextPlayerId(gameState, playerId);
 
+  // Update last played cards
+  gameState.lastPlayed = {socketId: socketId, cards: move};
+  // Update pile (played cards)
+  gameState.pile.push(...move);
+
+  // If the current hand has only one card left, set mustBeat to true for the previous player
   if (player.hand.length === 1) {
-    const nextPlayer = gameState.players.find(p => p.id === nextPlayerId);
-    nextPlayer!.mustBeat = true;
+    const previousPlayer = getPreviousPlayer(gameState, socketId);
+    previousPlayer!.mustBeat = true;
   }
 
   // 3. Check win
   if (player.hand.length === 0) {
     gameState.phase = "finish";
-    log(`Player ${playerId} wins!`, "info");
+    log(`Player ${socketId} wins!`, "info");
   }
 
   return gameState;
 }
 
-function getNextPlayerId(gameState: CurrentGameState, currentId: string): string {
-  const idx = gameState.players.findIndex(p => p.id === currentId);
-  return gameState.players[(idx + 1) % gameState.players.length].id;
+export const getPreviousPlayer = (gameState: CurrentGameState, currentSocketId: string): Player => {
+  const idx = gameState.players.findIndex(p => p.socketId === currentSocketId);
+  return gameState.players[(idx + gameState.players.length - 1) % gameState.players.length];
 }

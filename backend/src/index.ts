@@ -12,7 +12,7 @@ config({path: ".env.local"});
 
 const app = express()
 
-connectDB();
+await connectDB();
 
 // Middleware to parse JSON
 app.use(express.json());

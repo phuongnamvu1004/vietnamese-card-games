@@ -16,6 +16,11 @@ export class Card {
     return this.suit;
   }
 
+  equals(other: Card): boolean {
+    return this.rank === other.getRank && this.suit === other.getSuit;
+  }
+
+
   toString(): string {
     const rankStr = Card.rankToString(this.rank);
     return `${rankStr} of ${this.suit}`;
@@ -45,7 +50,7 @@ export class Card {
   }
 }
 
-export function shuffleDeck(deck: Card[]): Card[] {
+export const shuffleDeck = (deck: Card[]): Card[] => {
   const shuffled = [...deck];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -54,7 +59,7 @@ export function shuffleDeck(deck: Card[]): Card[] {
   return shuffled;
 }
 
-export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: number): Card[][] {
+export const dealCards = (deck: Card[], numPlayers: number, cardsPerPlayer: number): Card[][] => {
   const hands: Card[][] = Array.from({length: numPlayers}, () => []);
 
   for (let i = 0; i < cardsPerPlayer; i++) {

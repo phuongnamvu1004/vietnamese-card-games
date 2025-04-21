@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "target": "ES2020",
-    "module": "CommonJS",
-    "outDir": "dist",
-    "rootDir": ".",
+    "target": "es2022", // or higher, e.g., "esnext"
+    "module": "esnext", // or "node16", "nodenext", etc.
+    "moduleResolution": "node",
+    "strict": true,
     "esModuleInterop": true,
-    "strict": true
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
-    "include": ["src", "tests"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

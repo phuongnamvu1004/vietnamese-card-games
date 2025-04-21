@@ -1,7 +1,6 @@
 import { Card } from "../game/shared/cards";
 
 type Player = {
-  id: string,
   socketId: string,
   hand: Card[],
   buyIn: number,
@@ -15,13 +14,14 @@ type BaseGameState = {
   deck: Card[],
   pile: Card[],
   currentTurn: string,
-  lastPlayed: { playerId: string, cards: Card[] },
+  lastPlayed: { socketId: string, cards: Card[] },
   phase: "waiting" | "playing" | "finish",
 }
 
 type SamGameState = BaseGameState & {
-  nextPlayerStatus: "regular" | "mustBeat",
-  instantWinPlayers: string[]
+  gameType: "sam",
+  valuePerCard: number,
+  instantWinPlayers: Player[] // Replace it with real fields for sam
 }
 
 type PhomGameState = BaseGameState & {
