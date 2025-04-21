@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CyberpunkLayout from '../../Constant/CyberpunkLayout';
@@ -11,7 +11,7 @@ interface SignUpProps {
   onSignUp?: () => void;
 }
 
-const SignUp: React.FC<SignUpProps> = ({}) => {
+const SignUp: React.FC<SignUpProps> = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -35,8 +35,8 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const {name, value} = e.target;
+    setFormData({...formData, [name]: value});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,13 +61,14 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
       });
 
       setMessage('Signup successful! Redirecting to login...');
-      setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
+      setFormData({fullName: '', email: '', password: '', confirmPassword: ''});
 
       setTimeout(() => {
         navigate('/login');
         setIsLoading(false);
       }, 2000);
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
       setIsLoading(false);
     }
@@ -76,17 +77,21 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
   return (
     <CyberpunkLayout isLoading={isLoading} loadingText="CONFIGURING ACCESS">
       {/* Logo Component */}
-      <Logo subtitle="/ CREATE YOUR ACCOUNT /" size="md" />
+      <Logo subtitle="/ CREATE YOUR ACCOUNT /" size="md"/>
 
       {/* Signup Form Card */}
       <div className="relative z-10 pt-32 flex flex-col items-center justify-center min-h-screen px-4">
-        <div className="relative w-full max-w-md bg-gray-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] overflow-hidden">
+        <div
+          className="relative w-full max-w-md bg-gray-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] overflow-hidden">
           {/* Digital lines effect */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
-          <div className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
+          <div
+            className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
+          <div
+            className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
 
           <div className="p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center font-mono text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">
+            <h2
+              className="text-2xl font-bold mb-6 text-center font-mono text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">
               SIGN UP
             </h2>
 
@@ -102,7 +107,8 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
 
             {/* Success Message */}
             {message && (
-              <div className="mb-6 p-3 border border-green-500 bg-green-500/10 rounded text-green-400 text-sm font-mono">
+              <div
+                className="mb-6 p-3 border border-green-500 bg-green-500/10 rounded text-green-400 text-sm font-mono">
                 <div className="flex items-center">
                   <span className="mr-2 text-lg">✓</span>
                   <span>{message}</span>

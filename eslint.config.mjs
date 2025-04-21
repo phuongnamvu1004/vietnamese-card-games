@@ -12,7 +12,6 @@ export default defineConfig([
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
 
-  // Frontend & Shared files
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
@@ -23,18 +22,21 @@ export default defineConfig([
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
+    settings: {
+      react: {
+        version: '19.0',
+      },
+    },
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         {allowConstantExport: true},
-
       ],
-      "react/react-in-jsx-scope": "off"
+      'react/react-in-jsx-scope': 'off',
     },
   },
 
-  // Backend override
   {
     files: ['backend/**/*.{js,ts}'],
     languageOptions: {

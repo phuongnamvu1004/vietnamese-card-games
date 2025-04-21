@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CyberpunkLayout from '../../Constant/CyberpunkLayout';
@@ -10,7 +10,7 @@ interface LoginProps {
   onLogin?: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({}) => {
+const Login: React.FC<LoginProps> = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -31,8 +31,8 @@ const Login: React.FC<LoginProps> = ({}) => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const {name, value} = e.target;
+    setFormData({...formData, [name]: value});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,13 +53,14 @@ const Login: React.FC<LoginProps> = ({}) => {
       });
 
       setMessage('Login successful! Redirecting...');
-      setFormData({ email: '', password: '' });
+      setFormData({email: '', password: ''});
 
       setTimeout(() => {
         setIsLoading(false);
         navigate('/game'); // Redirect to game page
       }, 2000);
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.log('Login error:', err.response?.data);
       setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
       setIsLoading(false);
@@ -69,17 +70,21 @@ const Login: React.FC<LoginProps> = ({}) => {
   return (
     <CyberpunkLayout isLoading={isLoading} loadingText="VERIFYING ACCESS">
       {/* Logo Component */}
-      <Logo subtitle="/ ACCESS YOUR ACCOUNT /" size="md" />
+      <Logo subtitle="/ ACCESS YOUR ACCOUNT /" size="md"/>
 
       {/* Login Form Card */}
       <div className="relative z-10 pt-32 flex flex-col items-center justify-center min-h-screen px-4">
-        <div className="relative w-full max-w-md bg-gray-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] overflow-hidden">
+        <div
+          className="relative w-full max-w-md bg-gray-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] overflow-hidden">
           {/* Digital lines effect */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
-          <div className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
+          <div
+            className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
+          <div
+            className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
 
           <div className="p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center font-mono text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">
+            <h2
+              className="text-2xl font-bold mb-6 text-center font-mono text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">
               LOGIN
             </h2>
 
@@ -95,7 +100,8 @@ const Login: React.FC<LoginProps> = ({}) => {
 
             {/* Success Message */}
             {message && (
-              <div className="mb-6 p-3 border border-green-500 bg-green-500/10 rounded text-green-400 text-sm font-mono">
+              <div
+                className="mb-6 p-3 border border-green-500 bg-green-500/10 rounded text-green-400 text-sm font-mono">
                 <div className="flex items-center">
                   <span className="mr-2 text-lg">✓</span>
                   <span>{message}</span>
@@ -160,7 +166,7 @@ const Login: React.FC<LoginProps> = ({}) => {
               {/* Sign Up Link */}
               <div className="mt-6 text-center">
                 <p className="text-gray-300 text-sm font-mono">
-                  DON'T HAVE AN ACCOUNT?{' '}
+                  DON&apos;T HAVE AN ACCOUNT?{' '}
                   <Link
                     to="/signup"
                     className="text-cyan-400 hover:text-cyan-300 hover:underline focus:outline-none transition-colors"
