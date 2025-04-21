@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import CyberpunkLayout from '../../Constant/CyberpunkLayout';
 import Logo from '../../Constant/ui/Logo';
 import CyberpunkInput from '../../Constant/ui/CyberpunkInput';
@@ -11,6 +12,8 @@ interface SignUpProps {
 }
 
 const SignUp: React.FC<SignUpProps> = ({}) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -24,7 +27,6 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  // Loading effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -32,19 +34,16 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setMessage('');
 
-    // Password validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -53,18 +52,20 @@ const SignUp: React.FC<SignUpProps> = ({}) => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Replace with actual API call
-      // await axios.post('/api/auth/signup', formData);
+      await axios.post('/api/auth/signup', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password
+      }, {
+        withCredentials: true
+      });
 
       setMessage('Signup successful! Redirecting to login...');
       setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
 
-      // Redirect after successful signup
       setTimeout(() => {
+        navigate('/login');
         setIsLoading(false);
-        // Redirect logic here
       }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');

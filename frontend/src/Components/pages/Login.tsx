@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import CyberpunkLayout from '../../Constant/CyberpunkLayout';
 import Logo from '../../Constant/ui/Logo';
 import CyberpunkInput from '../../Constant/ui/CyberpunkInput';
@@ -15,13 +16,13 @@ const Login: React.FC<LoginProps> = ({}) => {
     password: ''
   });
 
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  // Loading effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -29,35 +30,37 @@ const Login: React.FC<LoginProps> = ({}) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setMessage('');
-
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Replace with API call
-      // await axios.post('/api/auth/login', formData);
+      await axios.post('/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
       setMessage('Login successful! Redirecting...');
       setFormData({ email: '', password: '' });
 
-      // Redirect after successful login
       setTimeout(() => {
         setIsLoading(false);
-        // Redirect logic here
+        navigate('/game'); // Redirect to game page
       }, 2000);
     } catch (err: any) {
+      console.log('Login error:', err.response?.data);
       setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
       setIsLoading(false);
     }

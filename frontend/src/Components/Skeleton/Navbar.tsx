@@ -13,6 +13,9 @@ const Navbar = () => {
                 <li>
                     <Link to="/signup">Sign Up</Link>
                 </li>
+                <li>
+                    <Link to="/game">Game</Link>
+                </li>
             </ul>
         </div>
     )
