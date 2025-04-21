@@ -16,10 +16,17 @@ export const setupGameEvents = (io: Server, socket: Socket): void => {
       }
 
       // Get current hand from player with this socket.id
-      const currentHand = gameState.players.find((player: Player) => player.socketId === socket.id)?.hand;
+      const currentHand = gameState.players.find(
+        (player: Player) => player.socketId === socket.id,
+      )?.hand;
 
       // Play the card and get the updated GameState
-      const updatedGameState = playCard(gameState, socket.id, card, currentHand)
+      const updatedGameState = playCard(
+        gameState,
+        socket.id,
+        card,
+        currentHand,
+      );
 
       if (!updatedGameState) {
         log("Error playing card", "error");
@@ -36,14 +43,11 @@ export const setupGameEvents = (io: Server, socket: Socket): void => {
         });
 
         // TODO: Handle money logic (e.g., call calculateAndTransfer(roomId, updatedGameState))
-
       }
-
     } catch (error) {
       log("Error playing card:", error, "error");
       socket.emit("error", "Error playing card");
       return;
     }
-  })
+  });
 };
-

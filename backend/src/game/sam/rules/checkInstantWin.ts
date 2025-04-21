@@ -12,9 +12,7 @@ export enum InstantWinType {
 // Check for instant wins in the correct order: Dragon Straight > Four Twos > Flush Hand > Three Triplets >  Five Pairs
 export const checkInstantWin = (cards: Card[]) => {
   // check dragon straight
-  const sortedCards = cards
-    .map(card => card.getRank)
-    .sort((a, b) => b - a);
+  const sortedCards = cards.map((card) => card.getRank).sort((a, b) => b - a);
 
   if (sortedCards.includes(1) && sortedCards.includes(13)) {
     sortedCards.pop();
@@ -28,14 +26,14 @@ export const checkInstantWin = (cards: Card[]) => {
       }
     }
     return true;
-  }
+  };
 
   if (isDragonStraight()) {
     return InstantWinType.DragonStraight;
   }
 
   // To check for the collection types: fourTwos, threeTriplets, fivePairs => construct a dictionary
-  const cardRankDict: Record<number, number> = {}
+  const cardRankDict: Record<number, number> = {};
 
   for (const card of cards) {
     cardRankDict[card.getRank] = (cardRankDict[card.getRank] || 0) + 1;
@@ -47,17 +45,17 @@ export const checkInstantWin = (cards: Card[]) => {
   }
 
   // check flush hand (in the middle of collection types to keep the priority in order)
-  const suits = cards.map(card => card.getSuit)
+  const suits = cards.map((card) => card.getSuit);
 
   const isFlush = () => {
     const blackSuits = [Suit.Spade, Suit.Club];
     const redSuits = [Suit.Diamond, Suit.Heart];
 
-    const isAllBlack = suits.every(suit => blackSuits.includes(suit));
-    const isAllRed = suits.every(suit => redSuits.includes(suit));
+    const isAllBlack = suits.every((suit) => blackSuits.includes(suit));
+    const isAllRed = suits.every((suit) => redSuits.includes(suit));
 
     return isAllBlack || isAllRed;
-  }
+  };
 
   if (isFlush()) {
     return InstantWinType.FlushHand;
@@ -91,11 +89,11 @@ export const checkInstantWin = (cards: Card[]) => {
     }
 
     return countTwos === 5;
-  }
+  };
 
   if (isFivePairs()) {
     return InstantWinType.FivePairs;
   }
 
   return InstantWinType.None;
-}
+};

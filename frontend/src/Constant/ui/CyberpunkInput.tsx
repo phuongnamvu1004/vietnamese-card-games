@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface CyberpunkInputProps {
   id: string;
@@ -19,22 +19,22 @@ interface CyberpunkInputProps {
 }
 
 const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
-                                                         id,
-                                                         name,
-                                                         label,
-                                                         value,
-                                                         type = 'text',
-                                                         placeholder,
-                                                         required = false,
-                                                         minLength,
-                                                         onChange,
-                                                         onFocus,
-                                                         onBlur,
-                                                         isFocused = false,
-                                                         showPasswordToggle = false,
-                                                         showPassword = false,
-                                                         onTogglePassword,
-                                                       }) => {
+  id,
+  name,
+  label,
+  value,
+  type = "text",
+  placeholder,
+  required = false,
+  minLength,
+  onChange,
+  onFocus,
+  onBlur,
+  isFocused = false,
+  showPasswordToggle = false,
+  showPassword = false,
+  onTogglePassword,
+}) => {
   return (
     <div className="mb-5">
       <label
@@ -44,10 +44,10 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
         {label}
       </label>
       <div
-        className={`relative border ${isFocused ? 'border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]' : 'border-gray-700'} rounded-md bg-gray-800/50 transition-all duration-300`}
+        className={`relative border ${isFocused ? "border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]" : "border-gray-700"} rounded-md bg-gray-800/50 transition-all duration-300`}
       >
         <input
-          type={showPassword ? 'text' : type}
+          type={showPassword ? "text" : type}
           id={id}
           name={name}
           value={value}
@@ -57,7 +57,7 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
           placeholder={placeholder}
           required={required}
           minLength={minLength}
-          className={`w-full px-4 py-3 bg-transparent text-gray-200 outline-none font-mono ${showPasswordToggle ? 'pr-16' : ''}`}
+          className={`w-full px-4 py-3 bg-transparent text-gray-200 outline-none font-mono ${showPasswordToggle ? "pr-16" : ""}`}
         />
 
         {showPasswordToggle && (
@@ -66,7 +66,7 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
             onClick={onTogglePassword}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-cyan-400 hover:text-cyan-300 text-sm font-mono focus:outline-none"
           >
-            {showPassword ? 'HIDE' : 'SHOW'}
+            {showPassword ? "HIDE" : "SHOW"}
           </button>
         )}
 

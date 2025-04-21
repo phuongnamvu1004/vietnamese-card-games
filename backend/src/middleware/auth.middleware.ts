@@ -7,7 +7,11 @@ import { getUserById } from "../models/user.model";
 
 config({ path: ".env.local" });
 
-export const protectRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const protectRoute = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     log("Cookies received:", req.cookies, "info");
     const token = req.cookies.jwt;

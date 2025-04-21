@@ -1,39 +1,39 @@
 import { Card } from "../game/shared/cards";
 
 type Player = {
-  socketId: string,
-  hand: Card[],
-  buyIn: number,
-  gameBalance: number,
-  mustBeat: boolean,
-  state: "instantWin" | "waitingForTurn" | "inTurn"
-}
+  socketId: string;
+  hand: Card[];
+  buyIn: number;
+  gameBalance: number;
+  mustBeat: boolean;
+  state: "instantWin" | "waitingForTurn" | "inTurn";
+};
 
 type BaseGameState = {
-  players: Player[],
-  deck: Card[],
-  pile: Card[],
-  currentTurn: string,
-  lastPlayed: { socketId: string, cards: Card[] },
-  phase: "waiting" | "playing" | "finish",
-}
+  players: Player[];
+  deck: Card[];
+  pile: Card[];
+  currentTurn: string;
+  lastPlayed: { socketId: string; cards: Card[] };
+  phase: "waiting" | "playing" | "finish";
+};
 
 type SamGameState = BaseGameState & {
-  gameType: "sam",
-  valuePerCard: number,
-  instantWinPlayers: Player[] // Replace it with real fields for sam
-}
+  gameType: "sam";
+  valuePerCard: number;
+  instantWinPlayers: Player[]; // Replace it with real fields for sam
+};
 
 type PhomGameState = BaseGameState & {
-  gameType: "phom",
-  phomSpecificField: undefined // Replace it with real fields for phom
-}
+  gameType: "phom";
+  phomSpecificField: undefined; // Replace it with real fields for phom
+};
 
 type CurrentGameState = SamGameState | PhomGameState;
 
 type GameLog = {
-  playerId: string,
-  action: "draw" | "play" | "discard" | "instantWin",
-  card: Card,
-  createdAt: Date
-}
+  playerId: string;
+  action: "draw" | "play" | "discard" | "instantWin";
+  card: Card;
+  createdAt: Date;
+};

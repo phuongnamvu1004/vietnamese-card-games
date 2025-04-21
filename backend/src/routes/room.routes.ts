@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import { protectRoute } from "../middleware/auth.middleware";
 import { createNewRoom } from "../controllers/room.controller";
 

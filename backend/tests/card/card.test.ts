@@ -1,4 +1,9 @@
-import { Card, dealCards, shuffleDeck, Suit } from "../../src/game/shared/cards";
+import {
+  Card,
+  dealCards,
+  shuffleDeck,
+  Suit,
+} from "../../src/game/shared/cards";
 
 describe("CardDisplay class test", () => {
   test("CardDisplay creation + string representation + getRank", () => {
@@ -42,5 +47,4 @@ describe("CardDisplay class test", () => {
     expect(hands[2].length).toBe(13);
     expect(hands[3].length).toBe(13);
   });
-
-})
+});

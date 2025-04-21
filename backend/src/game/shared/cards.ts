@@ -2,11 +2,14 @@ export enum Suit {
   Spade = "spade",
   Club = "club",
   Diamond = "diamond",
-  Heart = "heart"
-};
+  Heart = "heart",
+}
 
 export class Card {
-  constructor(private suit: Suit, private rank: number) {}
+  constructor(
+    private suit: Suit,
+    private rank: number,
+  ) {}
 
   get getRank(): number {
     return this.rank;
@@ -20,7 +23,6 @@ export class Card {
     return this.rank === other.getRank && this.suit === other.getSuit;
   }
 
-
   toString(): string {
     const rankStr = Card.rankToString(this.rank);
     return `${rankStr} of ${this.suit}`;
@@ -28,10 +30,10 @@ export class Card {
 
   static rankToString(rank: number): string {
     const faceCards: Record<number, string> = {
-      1: 'A',
-      11: 'J',
-      12: 'Q',
-      13: 'K',
+      1: "A",
+      11: "J",
+      12: "Q",
+      13: "K",
     };
     return faceCards[rank] || rank.toString();
   }
@@ -57,10 +59,14 @@ export const shuffleDeck = (deck: Card[]): Card[] => {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-}
+};
 
-export const dealCards = (deck: Card[], numPlayers: number, cardsPerPlayer: number): Card[][] => {
-  const hands: Card[][] = Array.from({length: numPlayers}, () => []);
+export const dealCards = (
+  deck: Card[],
+  numPlayers: number,
+  cardsPerPlayer: number,
+): Card[][] => {
+  const hands: Card[][] = Array.from({ length: numPlayers }, () => []);
 
   for (let i = 0; i < cardsPerPlayer; i++) {
     for (let p = 0; p < numPlayers; p++) {
@@ -70,4 +76,4 @@ export const dealCards = (deck: Card[], numPlayers: number, cardsPerPlayer: numb
   }
 
   return hands;
-}
+};

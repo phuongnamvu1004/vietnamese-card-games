@@ -19,7 +19,8 @@ export const mapUserData = (data: Record<string, unknown>): User => ({
   email: String(data.email),
   fullName: String(data.full_name),
   password: String(data.password),
-  profilePic: typeof data.profile_pic === 'string' ? data.profile_pic : undefined,
+  profilePic:
+    typeof data.profile_pic === "string" ? data.profile_pic : undefined,
   createdAt: String(data.created_at),
   updatedAt: String(data.updated_at),
 });
@@ -28,11 +29,11 @@ export const mapSafeUserData = (data: Record<string, unknown>): SafeUser => ({
   id: Number(data.id),
   email: String(data.email),
   fullName: String(data.full_name),
-  profilePic: typeof data.profile_pic === 'string' ? data.profile_pic : undefined,
+  profilePic:
+    typeof data.profile_pic === "string" ? data.profile_pic : undefined,
   createdAt: String(data.created_at),
   updatedAt: String(data.updated_at),
 });
-
 
 export const createUser = async (user: {
   email: string;
@@ -40,15 +41,15 @@ export const createUser = async (user: {
   password: string;
   profilePic?: string;
 }): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .insert([
       {
         email: user.email,
         full_name: user.fullName,
         password: user.password,
-        profile_pic: user.profilePic || ""
-      }
+        profile_pic: user.profilePic || "",
+      },
     ])
     .select()
     .single();
@@ -61,9 +62,8 @@ export const createUser = async (user: {
   return mapSafeUserData(data);
 };
 
-
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("email", email)
@@ -77,11 +77,13 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
   return mapUserData(data);
 };
 
-
-export const updateUserProfilePic = async (userId: number, profilePicUrl: string): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+export const updateUserProfilePic = async (
+  userId: number,
+  profilePicUrl: string,
+): Promise<SafeUser | null> => {
+  const { data, error } = await supabase
     .from("users")
-    .update({profile_pic: profilePicUrl})
+    .update({ profile_pic: profilePicUrl })
     .eq("id", userId)
     .select()
     .single();
@@ -91,9 +93,8 @@ export const updateUserProfilePic = async (userId: number, profilePicUrl: string
   return mapSafeUserData(data);
 };
 
-
 export const getUserById = async (id: number): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("id, email, full_name, profile_pic, created_at, updated_at")
     .eq("id", id)

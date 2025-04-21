@@ -38,7 +38,7 @@ const baseGameState: CurrentGameState = {
   deck: [], // don't need this for the test
   pile: [], // don't need this for the test (and not even for Sam implementation)
   currentTurn: "p1",
-  lastPlayed: {socketId: "p3", cards: [lastPlayedCard]},
+  lastPlayed: { socketId: "p3", cards: [lastPlayedCard] },
   phase: "playing",
   gameType: "sam",
   valuePerCard: 10,
@@ -57,7 +57,12 @@ describe("getPreviousPlayer", () => {
 
 describe("playCard", () => {
   it("should play a valid card and update game state", () => {
-    const updatedGameState = playCard(baseGameState, "p1", [card2], [card1, card2, card3]);
+    const updatedGameState = playCard(
+      baseGameState,
+      "p1",
+      [card2],
+      [card1, card2, card3],
+    );
 
     expect(updatedGameState).toEqual({
       ...baseGameState,
@@ -69,9 +74,9 @@ describe("playCard", () => {
         baseGameState.players[1],
         baseGameState.players[2],
       ],
-      lastPlayed: {socketId: "p1", cards: [card2]},
+      lastPlayed: { socketId: "p1", cards: [card2] },
       pile: [card2], // card2 is added to the pile
-    })
+    });
   });
 
   // it("should set mustBeat true if one card remains", () => {

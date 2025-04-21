@@ -4,25 +4,25 @@
 
 ```ts
 type User = {
-  id: string,
-  email: string,
-  fullName: string,
-  password: string,
-  profilePic?: string,
+  id: string;
+  email: string;
+  fullName: string;
+  password: string;
+  profilePic?: string;
   statistics: {
-    numGamesPlayed: number,
-    numGamesWon: number,
+    numGamesPlayed: number;
+    numGamesWon: number;
     numInstantWins: {
-      dragonStraight: number,
-      fourTwos: number,
-      flushHand: number,
-      threeTriplets: number,
-      fivePairs: number
-    },
-    winRate: number // numGamesWon / numGamesPlayed
-  },
-  currentBalance: number
-}
+      dragonStraight: number;
+      fourTwos: number;
+      flushHand: number;
+      threeTriplets: number;
+      fivePairs: number;
+    };
+    winRate: number; // numGamesWon / numGamesPlayed
+  };
+  currentBalance: number;
+};
 ```
 
 - CardDisplay/deck schema
@@ -32,11 +32,14 @@ export enum Suit {
   Spade = "spade",
   Club = "club",
   Diamond = "diamond",
-  Heart = "heart"
+  Heart = "heart",
 }
 
 export class CardDisplay {
-  constructor(public suit: Suit, public rank: number) {}
+  constructor(
+    public suit: Suit,
+    public rank: number,
+  ) {}
 
   toString(): string {
     const rankStr = CardDisplay.rankToString(this.rank);
@@ -45,10 +48,10 @@ export class CardDisplay {
 
   static rankToString(rank: number): string {
     const faceCards: Record<number, string> = {
-      1: 'A',
-      11: 'J',
-      12: 'Q',
-      13: 'K',
+      1: "A",
+      11: "J",
+      12: "Q",
+      13: "K",
     };
     return faceCards[rank] || rank.toString();
   }
@@ -76,7 +79,11 @@ export function shuffleDeck(deck: CardDisplay[]): CardDisplay[] {
   return shuffled;
 }
 
-export function dealCards(deck: CardDisplay[], numPlayers: number, cardsPerPlayer: number): CardDisplay[][] {
+export function dealCards(
+  deck: CardDisplay[],
+  numPlayers: number,
+  cardsPerPlayer: number,
+): CardDisplay[][] {
   const hands: CardDisplay[][] = Array.from({ length: numPlayers }, () => []);
 
   for (let i = 0; i < cardsPerPlayer; i++) {
@@ -88,32 +95,31 @@ export function dealCards(deck: CardDisplay[], numPlayers: number, cardsPerPlaye
 
   return hands;
 }
-
 ```
 
 - In-game instances
 
 ```ts
 type Player = {
-  id: string,
-  socketId: string,
-  hand: CardDisplay[],
-  buyIn: number,
-  state: "instantWin" | "waitingForTurn" | "inTurn"
-}
+  id: string;
+  socketId: string;
+  hand: CardDisplay[];
+  buyIn: number;
+  state: "instantWin" | "waitingForTurn" | "inTurn";
+};
 
 type GameState = {
-  roomId: string, // the 6-digit unique identifier for room
-  players: Player[],
-  deck: CardDisplay[], // current cards left in deck both before and after dealing
-  pile: CardDisplay[], // played cards
-  currentTurn: string, // socketId or userId
+  roomId: string; // the 6-digit unique identifier for room
+  players: Player[];
+  deck: CardDisplay[]; // current cards left in deck both before and after dealing
+  pile: CardDisplay[]; // played cards
+  currentTurn: string; // socketId or userId
   // waiting is for before the started (player not ready?)
-  // playing is marked by after dealing the cards 
+  // playing is marked by after dealing the cards
   // finish is for then the game has finished all the turns
-  phase: "waiting" | "playing" | "finish",
-  instantWinPlayers: Player[] // For this case, check for instant wins for all player then rank them to determine who 
-}
+  phase: "waiting" | "playing" | "finish";
+  instantWinPlayers: Player[]; // For this case, check for instant wins for all player then rank them to determine who
+};
 ```
 
 - Rules schemas
@@ -123,7 +129,7 @@ type GameState = {
 enum Move {
   pass = "pass",
   hit = "hit",
-  invade = "invade"
+  invade = "invade",
 }
 
 class RoundType {
@@ -140,24 +146,31 @@ class RoundType {
   }
 
   // for straight only, check for higher straight
-  static isHigherStraight(current: CardDisplay[], previous: CardDisplay[]): boolean {
-    const currentRanks = current.map(card => card.rank).sort((a, b) => a - b);
-    const previousRanks = previous.map(card => card.rank).sort((a, b) => a - b);
+  static isHigherStraight(
+    current: CardDisplay[],
+    previous: CardDisplay[],
+  ): boolean {
+    const currentRanks = current.map((card) => card.rank).sort((a, b) => a - b);
+    const previousRanks = previous
+      .map((card) => card.rank)
+      .sort((a, b) => a - b);
 
     if (currentRanks.length !== previousRanks.length) {
       return false;
     }
 
-    return currentRanks[currentRanks.length - 1] > previousRanks[previousRanks.length - 1];
+    return (
+      currentRanks[currentRanks.length - 1] >
+      previousRanks[previousRanks.length - 1]
+    );
   }
-
 }
 
 // Check for same RoundType first then compare the highest of element of prevPlayedCards and currentCards
 export const validateMove = (
-  prevPlayedCards: CardDisplay[], 
-  currentCards: CardDisplay[], 
-  roundType?: RoundType
+  prevPlayedCards: CardDisplay[],
+  currentCards: CardDisplay[],
+  roundType?: RoundType,
 ): boolean => {
   if (!roundType) {
     roundType = determineRoundType(prevPlayedCards);
@@ -168,9 +181,7 @@ export const validateMove = (
   if (!currentRoundType || currentRoundType !== roundType) {
     return false;
   } else {
-
   }
-
 
   return true; // Placeholder return value
 };
@@ -181,10 +192,10 @@ function determineRoundType(cards: CardDisplay[]): RoundType | undefined {
     return RoundType.Single;
   }
 
-  cardValueDict = {}
+  cardValueDict = {};
 
   for (const card of cards) {
-    cardValueDict.card.getValue() += 1
+    cardValueDict.card.getValue() += 1;
   }
   // check for pair
   if (cards.length === 2 && cardValueDict.length === 1) {
@@ -203,9 +214,7 @@ function determineRoundType(cards: CardDisplay[]): RoundType | undefined {
 
   // check for straight
   if (cards.length >= 3) {
-    const sortedCards = cards
-      .map(card => card.rank)
-      .sort((a, b) => a - b);
+    const sortedCards = cards.map((card) => card.rank).sort((a, b) => a - b);
 
     for (let i = 1; i < sortedCards.length; i++) {
       if (sortedCards[i] !== sortedCards[i - 1] + 1) {
@@ -216,9 +225,6 @@ function determineRoundType(cards: CardDisplay[]): RoundType | undefined {
     return RoundType.Straight;
   }
 
-  return undefined
-  
+  return undefined;
 }
 ```
-
-

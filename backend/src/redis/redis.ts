@@ -3,7 +3,7 @@ import { RedisStore } from "connect-redis"; // ✅ Named import
 import { config } from "dotenv";
 import { log } from "../lib/utils";
 
-config({path: ".env.local"});
+config({ path: ".env.local" });
 
 const redisClient = createClient({
   url: process.env.REDIS_URL,

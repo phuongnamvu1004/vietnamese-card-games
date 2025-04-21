@@ -6,12 +6,18 @@ import { findUserByEmail } from "../models/user.model";
 export const createNewRoom = async (req: Request, res: Response) => {
   try {
     // Destructure and validate request body
-    const {gameType, maxPlayers, buyIn, valuePerPoint, players}: {
-      gameType: "sam" | "phom",
-      maxPlayers: number,
-      buyIn: number,
-      valuePerPoint: number,
-      players: string[]
+    const {
+      gameType,
+      maxPlayers,
+      buyIn,
+      valuePerPoint,
+      players,
+    }: {
+      gameType: "sam" | "phom";
+      maxPlayers: number;
+      buyIn: number;
+      valuePerPoint: number;
+      players: string[];
     } = req.body;
 
     // Generate room ID
@@ -27,7 +33,7 @@ export const createNewRoom = async (req: Request, res: Response) => {
           throw new Error(`User not found for email: ${playerEmail}`);
         }
         return user.id;
-      })
+      }),
     );
 
     // Call createRoom to save the room
@@ -38,7 +44,7 @@ export const createNewRoom = async (req: Request, res: Response) => {
       maxPlayers: maxPlayers,
       players: playerIds,
       buyIn: buyIn,
-      valuePerPoint: valuePerPoint
+      valuePerPoint: valuePerPoint,
     });
     // Send success response
     log("Room created successfully:", roomId, "info");
@@ -46,19 +52,23 @@ export const createNewRoom = async (req: Request, res: Response) => {
     // create room-user key pairs for the host and the other players
     await createRoomPlayer({
       roomId: newRoom!.id,
-      userId: hostUserId
-    })
+      userId: hostUserId,
+    });
     for (const playerId of playerIds) {
       await createRoomPlayer({
         roomId: newRoom!.id,
-        userId: playerId
-      })
+        userId: playerId,
+      });
     }
 
-    res.status(201).json({message: "Room created successfully", roomId});
+    res.status(201).json({ message: "Room created successfully", roomId });
   } catch (error: unknown) {
     const err = toError(error);
-    log("Error in createNewRoom controller: ", err.message || "Internal server error", "error")
-    res.status(500).json({message: err.message || "Internal server error"});
+    log(
+      "Error in createNewRoom controller: ",
+      err.message || "Internal server error",
+      "error",
+    );
+    res.status(500).json({ message: err.message || "Internal server error" });
   }
 };

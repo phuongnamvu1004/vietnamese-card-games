@@ -1,4 +1,7 @@
-import { checkInstantWin, InstantWinType } from "../../src/game/sam/rules/checkInstantWin";
+import {
+  checkInstantWin,
+  InstantWinType,
+} from "../../src/game/sam/rules/checkInstantWin";
 import { Card, Suit } from "../../src/game/shared/cards";
 
 describe("checkInstantWin test", () => {
@@ -13,12 +16,11 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Spade, 7),
       new Card(Suit.Spade, 8),
       new Card(Suit.Spade, 9),
-      new Card(Suit.Spade, 10)
+      new Card(Suit.Spade, 10),
     ];
 
-
-    expect(checkInstantWin(cards)).toBe(InstantWinType.DragonStraight)
-  })
+    expect(checkInstantWin(cards)).toBe(InstantWinType.DragonStraight);
+  });
 
   test("Check Dragon Straight: Edge case for A", () => {
     const cards = [
@@ -31,11 +33,11 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Spade, 11),
       new Card(Suit.Spade, 12),
       new Card(Suit.Heart, 13),
-      new Card(Suit.Spade, 1)
+      new Card(Suit.Spade, 1),
     ];
 
-    expect(checkInstantWin(cards)).toBe(InstantWinType.DragonStraight)
-  })
+    expect(checkInstantWin(cards)).toBe(InstantWinType.DragonStraight);
+  });
 
   test("Check Flush Hand: red", () => {
     const cards = [
@@ -52,7 +54,7 @@ describe("checkInstantWin test", () => {
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FlushHand);
-  })
+  });
 
   test("Check Flush Hand: black", () => {
     const cards = [
@@ -69,7 +71,7 @@ describe("checkInstantWin test", () => {
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FlushHand);
-  })
+  });
 
   test("Check Four Twos", () => {
     const cards = [
@@ -86,7 +88,7 @@ describe("checkInstantWin test", () => {
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FourTwos);
-  })
+  });
 
   test("Check Three Triplets", () => {
     const cards = [
@@ -103,7 +105,7 @@ describe("checkInstantWin test", () => {
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.ThreeTriplets);
-  })
+  });
 
   test("Check Five Pairs", () => {
     const cards = [
@@ -120,7 +122,7 @@ describe("checkInstantWin test", () => {
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FivePairs);
-  })
+  });
 
   test("Check Instant Win priority: Dragon Straight > Flush Hand", () => {
     const cards = [
@@ -133,11 +135,11 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Spade, 7),
       new Card(Suit.Spade, 8),
       new Card(Suit.Club, 9),
-      new Card(Suit.Club, 10)
+      new Card(Suit.Club, 10),
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.DragonStraight);
-  })
+  });
 
   test("Check Instant Win priority: Four Twos > Three Triplets", () => {
     const cards = [
@@ -150,11 +152,11 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Heart, 3),
       new Card(Suit.Spade, 4),
       new Card(Suit.Club, 4),
-      new Card(Suit.Heart, 4)
+      new Card(Suit.Heart, 4),
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FourTwos);
-  })
+  });
 
   test("Check Instant Win priority: Flush Hand > Five Pairs", () => {
     const cards = [
@@ -167,7 +169,7 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Spade, 5),
       new Card(Suit.Club, 5),
       new Card(Suit.Spade, 6),
-      new Card(Suit.Club, 6)
+      new Card(Suit.Club, 6),
     ];
 
     expect(checkInstantWin(cards)).toBe(InstantWinType.FlushHand);
@@ -184,9 +186,7 @@ describe("checkInstantWin test", () => {
       new Card(Suit.Spade, 8),
       new Card(Suit.Club, 9),
       new Card(Suit.Spade, 10),
-    ]
+    ];
     expect(checkInstantWin(cards)).toBe(InstantWinType.None);
-  })
-
-
-})
+  });
+});
