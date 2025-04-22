@@ -19,6 +19,9 @@ const card7 = new Card(Suit.Heart, 9);
 // Last played card
 const lastPlayedCard = new Card(Suit.Club, 3);
 
+// Failed card
+const failedCard = new Card(Suit.Spade, 9);
+
 // Helper to create mock player
 const createPlayer = (id: string, hand: Card[], mustBeat = false): Player => ({
   socketId: id,
@@ -29,7 +32,7 @@ const createPlayer = (id: string, hand: Card[], mustBeat = false): Player => ({
   state: "waitingForTurn",
 });
 
-const baseGameState: CurrentGameState = {
+let baseGameState: CurrentGameState = {
   players: [
     createPlayer("p1", [card1, card2, card3]),
     createPlayer("p2", [card4, card5]),
@@ -38,7 +41,7 @@ const baseGameState: CurrentGameState = {
   deck: [], // don't need this for the test
   pile: [], // don't need this for the test (and not even for Sam implementation)
   currentTurn: "p1",
-  lastPlayed: { socketId: "p3", cards: [lastPlayedCard] },
+  lastPlayed: {socketId: "p3", cards: [lastPlayedCard]},
   phase: "playing",
   gameType: "sam",
   valuePerCard: 10,
@@ -46,7 +49,7 @@ const baseGameState: CurrentGameState = {
 };
 
 describe("getPreviousPlayer", () => {
-  it("should return previous player in circular order", () => {
+  test("should return previous player in circular order", () => {
     const previous = getPreviousPlayer(baseGameState, "p1");
     expect(previous.socketId).toBe("p3");
 
@@ -56,13 +59,15 @@ describe("getPreviousPlayer", () => {
 });
 
 describe("playCard", () => {
-  it("should play a valid card and update game state", () => {
+  test("Should play a valid card and update game state", () => {
     const updatedGameState = playCard(
       baseGameState,
       "p1",
       [card2],
       [card1, card2, card3],
     );
+
+    baseGameState = updatedGameState;
 
     expect(updatedGameState).toEqual({
       ...baseGameState,
@@ -74,35 +79,48 @@ describe("playCard", () => {
         baseGameState.players[1],
         baseGameState.players[2],
       ],
-      lastPlayed: { socketId: "p1", cards: [card2] },
+      lastPlayed: {socketId: "p1", cards: [card2]},
       pile: [card2], // card2 is added to the pile
     });
   });
 
-  // it("should set mustBeat true if one card remains", () => {
-  //   const mockState = structuredClone(baseGameState);
-  //   mockState.players[1].hand = [cardA, cardB];
-  //   mockState.players[0].hand = [cardA, cardB]; // will play 1 card, 1 remains
-  //   const move = [cardA];
-  //   const currentHand = [cardA, cardB];
-  //
-  //   const updatedState = playCard(mockState, "p0", move, currentHand); // fake player
-  //
-  //   const previous = getPreviousPlayer(mockState, "p0");
-  //   expect(previous.mustBeat).toBe(true);
-  // });
-  //
-  // it("should throw error if move is invalid", () => {
-  //   const mockState = structuredClone(baseGameState);
-  //   const move = [cardC];
-  //   const currentHand = [cardC];
-  //
-  //   // Change mock to return false for validation
-  //   const {validateMove} = require("../game/sam/rules/validateMove");
-  //   validateMove.mockImplementation(() => false);
-  //
-  //   expect(() => {
-  //     playCard(mockState, "p1", move, currentHand);
-  //   }).toThrow("Invalid move");
-  // });
+  test("Should set mustBeat true if one card remains", () => {
+    const updatedGameState = playCard(
+      baseGameState,
+      "p2",
+      [card4], // play 6 of Heart
+      [card4, card5],
+    );
+
+    baseGameState = updatedGameState;
+
+    expect(updatedGameState).toEqual({
+      ...baseGameState,
+      players: [
+        baseGameState.players[0],
+        {
+          ...baseGameState.players[1],
+          hand: [card5], // card4 is played
+        },
+        baseGameState.players[2],
+      ],
+      lastPlayed: {socketId: "p2", cards: [card4]},
+      pile: [card2, card4], // card2 is added to the pile
+    });
+    expect(updatedGameState.players[0].mustBeat).toBe(true); // p1 must beat
+  });
+
+  test("Should throw error if move is invalid", () => {
+    expect(() => {
+      playCard(baseGameState, "p3", [failedCard], [card6, card7]);
+    }).toThrow("Invalid move");
+  });
+
+  test("Should end the round and when all players reject to play/cannot defend", () => {
+    // TODO: Play a valid move for player 3 which cannot be defended by player 1 and 2 -> have to end round -> continue playing
+  });
+
+  test("Should finish the game when a player has no cards left + update transactions", () => {
+    // TODO: Player 3 continue playing and play all cards -> player 3 wins -> update game state (phase = "finish") -> update transactions
+  });
 });

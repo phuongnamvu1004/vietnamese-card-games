@@ -1,7 +1,7 @@
 import { CurrentGameState, Player } from "../../types/game";
 import { Card } from "../shared/cards";
 import { log } from "../../lib/utils";
-import { validateMove } from "./rules/validateMove";
+import { MoveStatus, validateMove } from "./rules/validateMove";
 
 export const playCard = (
   gameState: CurrentGameState,
@@ -20,8 +20,7 @@ export const playCard = (
   // 1. Validate move
   const lastPlayed = gameState.lastPlayed || null;
 
-  // Validate the move
-  if (!validateMove(lastPlayed?.cards, move, currentHand, player.mustBeat))
+  if (validateMove(lastPlayed?.cards, move, currentHand, player.mustBeat) === MoveStatus.INVALID)
     throw new Error("Invalid move");
 
   // 2. Apply move
@@ -31,7 +30,7 @@ export const playCard = (
   }
 
   // Update last played cards
-  gameState.lastPlayed = { socketId: socketId, cards: move };
+  gameState.lastPlayed = {socketId: socketId, cards: move};
   // Update pile (played cards)
   gameState.pile.push(...move);
 
@@ -58,6 +57,6 @@ export const getPreviousPlayer = (
     (p) => p.socketId === currentSocketId,
   );
   return gameState.players[
-    (idx + gameState.players.length - 1) % gameState.players.length
-  ];
+  (idx + gameState.players.length - 1) % gameState.players.length
+    ];
 };
