@@ -15,12 +15,12 @@ type BaseGameState = {
   pile: Card[];
   currentTurn: string;
   lastPlayed: { socketId: string; cards: Card[] };
+  betUnit: number; // The unit of bet for the game, value per card for Sam and other rules for Phom
   phase: "waiting" | "playing" | "finish";
 };
 
 type SamGameState = BaseGameState & {
   gameType: "sam";
-  valuePerCard: number;
   instantWinPlayers: Player[]; // Replace it with real fields for sam
 };
 

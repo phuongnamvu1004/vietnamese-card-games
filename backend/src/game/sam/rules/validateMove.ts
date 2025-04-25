@@ -1,6 +1,7 @@
 import { Card } from "../../shared/cards";
 
 export enum MoveType {
+  EMPTY = "empty", // for starting round
   SINGLE = "single",
   DOUBLE = "double",
   TRIPLET = "triplet",
@@ -93,9 +94,15 @@ export const validateMove = (
   currentHand: Card[],
   mustBeat: boolean,
 ): MoveStatus => {
-  // when at first turn, no cards are played
+  let prevMoveType;
+  if (previousState.length === 0) {
+    prevMoveType = {
+      type: MoveType.EMPTY // MoveType.EMPTY is only applied to previousState, handling empty round
+    }
+  } else {
+    prevMoveType = getMoveType(previousState);
+  }
 
-  const prevMoveType = getMoveType(previousState);
   const curMoveType = getMoveType(move);
 
   if (
@@ -117,13 +124,18 @@ export const validateMove = (
     return MoveStatus.INVALID;
   }
 
+  // Handle starting a new round
+  if (prevMoveType.type === MoveType.EMPTY) {
+    return MoveStatus.VALID;
+  }
+
   // check for higher straight
   if (
     prevMoveType.type === MoveType.STRAIGHT &&
     curMoveType.type === MoveType.STRAIGHT
   ) {
     return curMoveType.length! === prevMoveType.length! &&
-      curMoveType.idCard! > prevMoveType.idCard!
+    curMoveType.idCard! > prevMoveType.idCard!
       ? MoveStatus.VALID
       : MoveStatus.INVALID;
   }
@@ -134,7 +146,7 @@ export const validateMove = (
       return MoveStatus.INVALID;
     }
 
-    // check for must-beat case (báo còn 1 con): if we are in a single card round and the next person has only one card left => play the highest card available
+    // check for the must-beat case (báo còn 1 con): if we are in a single card round and the next person has only one card left => play the highest card available
     if (
       mustBeat &&
       prevMoveType.type === MoveType.SINGLE &&
@@ -148,7 +160,7 @@ export const validateMove = (
         return move[0].getRank === 1 ? MoveStatus.VALID : MoveStatus.INVALID;
       }
       return move[0].getRank > prevMoveType.idCard! &&
-        move[0].getRank === Math.max(...ranks)
+      move[0].getRank === Math.max(...ranks)
         ? MoveStatus.VALID
         : MoveStatus.INVALID;
     }
@@ -172,6 +184,6 @@ export const validateMove = (
     return MoveStatus.QUADRUPLET_STOP_TWO;
   }
 
-  // final case where prevMoveType.type !== curMoveType.type and it is not quadrupletStopTwo
+  // final case where prevMoveType.type !== curMoveType.type, and it is not quadrupletStopTwo
   return MoveStatus.INVALID;
 };

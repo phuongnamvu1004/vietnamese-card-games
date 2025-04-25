@@ -1,4 +1,5 @@
-import { getPreviousPlayer, playCard } from "../../src/game/sam/gameEngine";
+import { getNextPlayer, getPreviousPlayer } from "../../src/game/sam/helpers/getPlayer";
+import { playCard } from "../../src/game/sam/gameEngine";
 import { CurrentGameState, Player } from "../../src/types/game";
 import { Card, Suit } from "../../src/game/shared/cards";
 
@@ -44,11 +45,11 @@ let baseGameState: CurrentGameState = {
   lastPlayed: {socketId: "p3", cards: [lastPlayedCard]},
   phase: "playing",
   gameType: "sam",
-  valuePerCard: 10,
+  betUnit: 10,
   instantWinPlayers: [],
 };
 
-describe("getPreviousPlayer", () => {
+describe("getPlayer helper methods test", () => {
   test("should return previous player in circular order", () => {
     const previous = getPreviousPlayer(baseGameState, "p1");
     expect(previous.socketId).toBe("p3");
@@ -56,19 +57,27 @@ describe("getPreviousPlayer", () => {
     const previous2 = getPreviousPlayer(baseGameState, "p2");
     expect(previous2.socketId).toBe("p1");
   });
+
+  test("should return next player in circular order", () => {
+    const next = getNextPlayer(baseGameState, "p1");
+    expect(next.socketId).toBe("p2");
+
+    const next2 = getNextPlayer(baseGameState, "p3");
+    expect(next2.socketId).toBe("p1");
+  });
 });
+
 
 describe("playCard", () => {
   test("Should play a valid card and update game state", () => {
     const updatedGameState = playCard(
       baseGameState,
-      "p1",
+      "p1", // player 1 plays
       [card2],
       false
     );
 
-    baseGameState = updatedGameState;
-
+    if (!updatedGameState) throw new Error("Unexpected null game state");
     expect(updatedGameState).toEqual({
       ...baseGameState,
       players: [
@@ -82,6 +91,8 @@ describe("playCard", () => {
       lastPlayed: {socketId: "p1", cards: [card2]},
       pile: [card2], // card2 is added to the pile
     });
+
+    baseGameState = updatedGameState!;
   });
 
   test("Should set mustBeat true if one card remains", () => {
@@ -92,8 +103,7 @@ describe("playCard", () => {
       false
     );
 
-    baseGameState = updatedGameState;
-
+    if (!updatedGameState) throw new Error("Unexpected null game state");
     expect(updatedGameState).toEqual({
       ...baseGameState,
       players: [
@@ -108,6 +118,8 @@ describe("playCard", () => {
       pile: [card2, card4], // card2 is added to the pile
     });
     expect(updatedGameState.players[0].mustBeat).toBe(true); // p1 must beat
+
+    baseGameState = updatedGameState;
   });
 
   test("Should throw error if move is invalid", () => {
@@ -117,10 +129,50 @@ describe("playCard", () => {
   });
 
   test("Should end the round and when all players reject to play/cannot defend", () => {
-    // TODO: Play a valid move for player 3 which cannot be defended by player 1 and 2 -> have to end round -> continue playing
+    // player 3 plays card7 (9 of Heart) -> player 1 and 2 cannot defend -> should end round
+    const gameStateZero = playCard(baseGameState, "p3", [card7], false);
+
+    // player 1 and 2 pass as they cannot defend
+    const gameStateOne = playCard(gameStateZero!, "p1", [], true);
+    const gameStateTwo = playCard(gameStateOne!, "p2", [], true);
+
+    // round get back to player 3 -> Refresh last played cards and play a new card
+    const lastGameState = playCard(gameStateTwo!, "p3", [card6], false);
+
+    if (!lastGameState) throw new Error("Unexpected null game state");
+    expect(lastGameState).toEqual({
+      ...gameStateTwo,
+      players: [
+        gameStateTwo.players[0],
+        gameStateTwo.players[1],
+        {
+          ...gameStateTwo.players[2],
+          hand: [], // card6 is played
+        },
+      ],
+      lastPlayed: {socketId: "p3", cards: [card6]}, // last played card is reset and now player 3 plays a new card
+    });
+
+    baseGameState = lastGameState;
   });
 
   test("Should finish the game when a player has no cards left + update transactions", () => {
-    // TODO: Player 3 continue playing and play all cards -> player 3 wins -> update game state (phase = "finish") -> update transactions
+    // Check that game phase is finished
+    expect(baseGameState.phase).toBe("finish");
+
+    const player1 = baseGameState.players.find((p) => p.socketId === "p1")!;
+    const player2 = baseGameState.players.find((p) => p.socketId === "p2")!;
+    const player3 = baseGameState.players.find((p) => p.socketId === "p3")!; // Winner
+
+    const player1Cards = player1.hand.length;
+    const player2Cards = player2.hand.length;
+
+    const player1Loss = player1Cards * 10; // betUnit = 10
+    const player2Loss = player2Cards * 10; // betUnit = 10
+    const totalLoss = player1Loss + player2Loss;
+
+    expect(player1.gameBalance).toBe(1000 - player1Loss);
+    expect(player2.gameBalance).toBe(1000 - player2Loss);
+    expect(player3.gameBalance).toBe(1000 + totalLoss);
   });
 });
