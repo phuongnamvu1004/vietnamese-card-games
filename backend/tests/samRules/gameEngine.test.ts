@@ -64,7 +64,7 @@ describe("playCard", () => {
       baseGameState,
       "p1",
       [card2],
-      [card1, card2, card3],
+      false
     );
 
     baseGameState = updatedGameState;
@@ -89,7 +89,7 @@ describe("playCard", () => {
       baseGameState,
       "p2",
       [card4], // play 6 of Heart
-      [card4, card5],
+      false
     );
 
     baseGameState = updatedGameState;
@@ -112,7 +112,7 @@ describe("playCard", () => {
 
   test("Should throw error if move is invalid", () => {
     expect(() => {
-      playCard(baseGameState, "p3", [failedCard], [card6, card7]);
+      playCard(baseGameState, "p3", [failedCard], false);
     }).toThrow("Invalid move");
   });
 
