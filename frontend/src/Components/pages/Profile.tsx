@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import CyberpunkLayout from "../../Constant/CyberpunkLayout";
 import Logo from "../../Constant/ui/Logo";
 import defaultAvatar from "../../assets/default-avatar.png";
-import Neonbutton from "../../Constant/ui/Neonbutton";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -10,6 +9,8 @@ interface UserStatistics {
   gamesPlayed: number;
   wins: number;
   losses: number;
+  winRate: number;
+  specialWins: number;
 }
 
 const Profile: React.FC = () => {
@@ -23,6 +24,8 @@ const Profile: React.FC = () => {
     gamesPlayed: 0,
     wins: 0,
     losses: 0,
+    winRate: 0,
+    specialWins: 0,
   });
 
   const [uploading, setUploading] = useState(false);
@@ -30,7 +33,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await axios.get("/api/auth/me", { withCredentials: true });
+        const userRes = await axios.get("/api/auth/user-profile", { withCredentials: true });
         const statsRes = await axios.get("/api/user/statistics", { withCredentials: true });
 
         setUser({
@@ -39,15 +42,27 @@ const Profile: React.FC = () => {
           profilePic: userRes.data.profilePic || "/assets/default-avatar.png",
         });
 
-        const samGames = statsRes.data.samData?.gamesPlayed || 0;
-        const phomGames = statsRes.data.phomData?.gamesPlayed || 0;
-        const samWins = statsRes.data.samData?.wins || 0;
-        const phomWins = statsRes.data.phomData?.wins || 0;
-        
+        const samData = statsRes.data.samData || {};
+        const phomData = statsRes.data.phomData || {};
+
+        const samGames = samData.gamesPlayed || 0;
+        const phomGames = phomData.gamesPlayed || 0;
+        const samWins = samData.wins || 0;
+        const phomWins = phomData.wins || 0;
+
+        const winRate = samData.winRate || 0; // from database
+        const specialWins = (samData.instantWins?.dragonStraight || 0)
+                          + (samData.instantWins?.fourTwos || 0)
+                          + (samData.instantWins?.flushHand || 0)
+                          + (samData.instantWins?.threeTriplets || 0)
+                          + (samData.instantWins?.fivePairs || 0);
+
         setStatistics({
           gamesPlayed: samGames + phomGames,
           wins: samWins + phomWins,
           losses: (samGames + phomGames) - (samWins + phomWins),
+          winRate,
+          specialWins,
         });
       } catch (error) {
         console.error("Failed to fetch profile data", error);
@@ -66,7 +81,7 @@ const Profile: React.FC = () => {
       try {
         setUploading(true);
         await axios.post("/api/user/profile", { profilePic: reader.result }, { withCredentials: true });
-        setUser((prev) => ({ ...prev, profilePicture: reader.result as string }));
+        setUser((prev) => ({ ...prev, profilePic: reader.result as string }));
       } catch (error) {
         console.error("Failed to upload new profile picture", error);
       } finally {
@@ -108,7 +123,7 @@ const Profile: React.FC = () => {
           </div>
 
           {/* Statistics */}
-          <div className="grid grid-cols-3 gap-4 text-center font-mono text-cyan-200">
+          <div className="grid grid-cols-2 gap-4 text-center font-mono text-cyan-200">
             <div>
               <div className="text-lg font-bold">{statistics.gamesPlayed}</div>
               <div className="text-xs text-gray-400">Games Played</div>
@@ -121,9 +136,16 @@ const Profile: React.FC = () => {
               <div className="text-lg font-bold">{statistics.losses}</div>
               <div className="text-xs text-gray-400">Losses</div>
             </div>
+            <div>
+              <div className="text-lg font-bold">{statistics.winRate.toFixed(1)}%</div>
+              <div className="text-xs text-gray-400">Win Rate</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold">{statistics.specialWins}</div>
+              <div className="text-xs text-gray-400">Special Wins</div>
+            </div>
           </div>
 
-          {/* Go back */}
           <div className="mt-8 text-center">
             <Link
               to="/game"
