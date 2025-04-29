@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./Components/pages/Home"; // This is now your Welcome page
-import Login from "./Components/pages/Login";
-import SignUp from "./Components/pages/SignUp";
-import Profile from "./Components/pages/Profile";
-import Game from "./Components/pages/Game";
+import Home from "./pages/Home"; // This is now your Welcome page
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import Profile from "./pages/Profile";
+import Game from "./pages/Game";
 
 const App = () => {
   return (

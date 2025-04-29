@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { axiosInstance } from "../../lib/axios";
+import defaultAvatar from "../../assets/default-avatar.png"; // ✅ Add this
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<null | { fullName: string; profilePicture: string }>(null);
@@ -9,10 +10,10 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("/api/auth/check-auth", { withCredentials: true });
+        const res = await axiosInstance.get("/api/user/user-profile"); // ✅ use correct backend route
         setUser({
           fullName: res.data.fullName,
-          profilePicture: res.data.profilePic || "/assets/default-avatar.png",
+          profilePicture: res.data.profilePic || defaultAvatar, // ✅ fallback here
         });
       } catch {
         setUser(null);
@@ -23,7 +24,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      await axiosInstance.post("/api/auth/logout");
       setUser(null);
       navigate("/login");
     } catch (error) {
@@ -33,12 +34,10 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="w-full flex items-center justify-between px-8 py-4 bg-gray-900/80 backdrop-blur-md shadow-md">
-      {/* Logo */}
       <Link to="/" className="text-2xl font-bold font-mono text-cyan-400 hover:text-cyan-300 transition">
         VIETNAMESE CARD GAME
       </Link>
 
-      {/* Menu */}
       <ul className="flex items-center gap-6 font-mono text-sm">
         <li>
           <Link to="/" className="text-cyan-400 hover:text-cyan-300 transition">
@@ -67,16 +66,17 @@ const Navbar: React.FC = () => {
               </Link>
             </li>
             <li>
-              <button
-                onClick={handleLogout}
-                className="text-red-400 hover:text-red-300 transition"
-              >
+              <button onClick={handleLogout} className="text-red-400 hover:text-red-300 transition">
                 Logout
               </button>
             </li>
             <li>
               <img
                 src={user.profilePicture}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = defaultAvatar;
+                }}
                 alt="Avatar"
                 onClick={() => navigate("/profile")}
                 className="w-10 h-10 rounded-full border-2 border-cyan-400 hover:border-pink-400 cursor-pointer transition object-cover"

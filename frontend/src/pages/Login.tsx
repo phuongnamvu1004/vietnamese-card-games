@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../../lib/axios";
-import CyberpunkLayout from "../../Constant/CyberpunkLayout";
-import Logo from "../../Constant/ui/Logo";
-import CyberpunkInput from "../../Constant/ui/CyberpunkInput";
-import Neonbutton from "../../Constant/ui/Neonbutton";
-import AuthMessageBox from "../../Constant/Function/AuthMessageBox";
-import AuthFormLayout from "../../Constant/Function/AuthFormLayout";
+import { axiosInstance } from "../lib/axios";
+import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import Logo from "../Components/ui/Logo";
+import CyberpunkInput from "../Components/ui/CyberpunkInput";
+import Neonbutton from "../Components/ui/Neonbutton";
+import AuthMessageBox from "../Components/ui/AuthMessageBox";
+import AuthFormLayout from "../Components/ui/AuthFormLayout";
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });

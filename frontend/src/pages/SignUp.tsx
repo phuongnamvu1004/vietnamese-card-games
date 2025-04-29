@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import CyberpunkLayout from "../../Constant/CyberpunkLayout";
-import Logo from "../../Constant/ui/Logo";
-import CyberpunkInput from "../../Constant/ui/CyberpunkInput";
-import Neonbutton from "../../Constant/ui/Neonbutton";
-import AuthMessageBox from "../../Constant/Function/AuthMessageBox";
-import AuthFormLayout from "../../Constant/Function/AuthFormLayout";
+import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import Logo from "../Components/ui/Logo";
+import CyberpunkInput from "../Components/ui/CyberpunkInput";
+import Neonbutton from "../Components/ui/Neonbutton";
+import AuthMessageBox from "../Components/ui/AuthMessageBox";
+import AuthFormLayout from "../Components/ui/AuthFormLayout";
+import { axiosInstance } from "../lib/axios";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -47,14 +47,13 @@ const SignUp: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await axios.post(
+      await axiosInstance.post(
         "api/auth/signup",
         {
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
         },
-        { withCredentials: true }
       );
 
       setMessage("Signup successful! Redirecting to login...");

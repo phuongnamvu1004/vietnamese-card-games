@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import CyberpunkLayout from "../../Constant/CyberpunkLayout";
-import Logo from "../../Constant/ui/Logo";
-import Neonbutton from "../../Constant/ui/Neonbutton";
-import PokerChip from "../../Constant/ui/PokerChip";
+import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import Logo from "../Components/ui/Logo";
+import Neonbutton from "../Components/ui/Neonbutton";
+import PokerChip from "../Components/ui/PokerChip";
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);

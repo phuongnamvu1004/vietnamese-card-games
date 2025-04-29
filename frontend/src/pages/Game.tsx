@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../Components/Skeleton/Navbar";
-import CyberpunkLayout from "../../Constant/CyberpunkLayout";
-import Neonbutton from "../../Constant/ui/Neonbutton";
-import axios from "axios";
+import Navbar from "../Components/Layout/Navbar";
+import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import Neonbutton from "../Components/ui/Neonbutton";
+import { axiosInstance } from "../lib/axios";
 
 const Game: React.FC = () => {
   const [user, setUser] = useState<null | {
@@ -15,7 +15,7 @@ const Game: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("/api/auth/check-auth", { withCredentials: true });
+        const res = await axiosInstance.get("/api/auth/check");
         setUser({
           fullName: res.data.fullName,
           profilePicture: res.data.profilePic || "/assets/default-avatar.png",
