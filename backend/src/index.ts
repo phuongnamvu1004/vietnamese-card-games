@@ -9,11 +9,11 @@ import authRouter from "./routes/auth.routes";
 import userRouter from "./routes/user.routes";
 import roomRouter from "./routes/room.routes";
 
-config({ path: ".env.local" });
+config({path: ".env.local"});
 
 const app = express();
 
-await connectDB();
+connectDB();
 
 // Middleware to parse JSON
 app.use(express.json());
