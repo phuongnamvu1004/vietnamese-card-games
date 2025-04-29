@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { axiosInstance } from "../../lib/axios";
 import CyberpunkLayout from "../../Constant/CyberpunkLayout";
 import Logo from "../../Constant/ui/Logo";
 import CyberpunkInput from "../../Constant/ui/CyberpunkInput";
@@ -35,16 +35,13 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await axios.post(
-        "/api/auth/login",
+      console.log("Logging in with data:", formData);
+      await axiosInstance.post(
+        "api/auth/login",
         {
           email: formData.email,
           password: formData.password,
         },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
       );
 
       setMessage("Login successful! Redirecting...");

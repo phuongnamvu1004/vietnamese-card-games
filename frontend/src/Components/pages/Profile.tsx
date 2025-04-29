@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import CyberpunkLayout from "../../Constant/CyberpunkLayout";
-import Logo from "../../Constant/ui/Logo";
 import defaultAvatar from "../../assets/default-avatar.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import CyberpunkLayout from "../../Constant/CyberpunkLayout";
+import Logo from "../../Constant/ui/Logo";
 
 interface UserStatistics {
   gamesPlayed: number;
