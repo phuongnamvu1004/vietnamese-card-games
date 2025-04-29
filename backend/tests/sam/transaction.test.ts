@@ -72,8 +72,7 @@ describe("calculateTransactionPerPlayer", () => {
     const player = createPlayer("p6", [
       new Card(Suit.Heart, 2),
       new Card(Suit.Spade, 2),
-      new Card(Suit.Diamond, 2),
-      new Card(Suit.Club, 2),
+      new Card(Suit.Diamond, 2)
     ], 50); // Only has 50 left
 
     const loss = calculateTransactionPerPlayer(player, 10);

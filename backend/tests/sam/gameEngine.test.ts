@@ -40,7 +40,6 @@ let baseGameState: CurrentGameState = {
     createPlayer("p3", [card6, card7]),
   ],
   deck: [], // don't need this for the test
-  pile: [], // don't need this for the test (and not even for Sam implementation)
   currentTurn: "p1",
   lastPlayed: {socketId: "p3", cards: [lastPlayedCard]},
   phase: "playing",
@@ -89,7 +88,6 @@ describe("playCard", () => {
         baseGameState.players[2],
       ],
       lastPlayed: {socketId: "p1", cards: [card2]},
-      pile: [card2], // card2 is added to the pile
     });
 
     baseGameState = updatedGameState!;
@@ -115,7 +113,6 @@ describe("playCard", () => {
         baseGameState.players[2],
       ],
       lastPlayed: {socketId: "p2", cards: [card4]},
-      pile: [card2, card4], // card2 is added to the pile
     });
     expect(updatedGameState.players[0].mustBeat).toBe(true); // p1 must beat
 
