@@ -10,13 +10,13 @@ export const createNewRoom = async (req: Request, res: Response) => {
       gameType,
       maxPlayers,
       buyIn,
-      valuePerPoint,
+      betUnit,
       players,
     }: {
       gameType: "sam" | "phom";
       maxPlayers: number;
       buyIn: number;
-      valuePerPoint: number;
+      betUnit: number;
       players: string[];
     } = req.body;
 
@@ -44,7 +44,7 @@ export const createNewRoom = async (req: Request, res: Response) => {
       maxPlayers: maxPlayers,
       players: playerIds,
       buyIn: buyIn,
-      valuePerPoint: valuePerPoint,
+      betUnit: betUnit,
     });
     // Send success response
     log("Room created successfully:", roomId, "info");
@@ -61,7 +61,7 @@ export const createNewRoom = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(201).json({ message: "Room created successfully", roomId });
+    res.status(201).json({message: "Room created successfully", roomId});
   } catch (error: unknown) {
     const err = toError(error);
     log(
@@ -69,6 +69,6 @@ export const createNewRoom = async (req: Request, res: Response) => {
       err.message || "Internal server error",
       "error",
     );
-    res.status(500).json({ message: err.message || "Internal server error" });
+    res.status(500).json({message: err.message || "Internal server error"});
   }
 };

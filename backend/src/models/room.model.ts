@@ -10,7 +10,8 @@ export interface Room {
   maxPlayers: number;
   players: number[]; // user ID
   buyIn: number;
-  valuePerPoint: number;
+  betUnit: number;
+  isOnline: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,7 +24,8 @@ export const mapRoomData = (data: Record<string, unknown>): Room => ({
   maxPlayers: Number(data.max_players),
   players: Array.isArray(data.players) ? (data.players as number[]) : [],
   buyIn: Number(data.buy_in),
-  valuePerPoint: Number(data.value_per_point),
+  betUnit: Number(data.bet_unit),
+  isOnline: Boolean(data.is_online),
   createdAt: String(data.created_at),
   updatedAt: String(data.updated_at),
 });
@@ -54,9 +56,9 @@ export const createRoom = async (room: {
   maxPlayers: number;
   players: number[];
   buyIn: number;
-  valuePerPoint: number;
+  betUnit: number;
 }) => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("rooms")
     .insert([
       {
@@ -66,7 +68,7 @@ export const createRoom = async (room: {
         max_players: room.maxPlayers,
         players: room.players,
         buy_in: room.buyIn,
-        value_per_point: room.valuePerPoint,
+        bet_unit: room.betUnit,
       },
     ])
     .select()
@@ -81,7 +83,7 @@ export const createRoom = async (room: {
 };
 
 export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("room_players")
     .insert([
       {
@@ -101,7 +103,7 @@ export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
 };
 
 export const updateRoom = async (room: Room) => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("rooms")
     .update({
       room_id: room.roomId,
@@ -110,7 +112,8 @@ export const updateRoom = async (room: Room) => {
       max_players: room.maxPlayers,
       players: room.players,
       buy_in: room.buyIn,
-      value_per_point: room.valuePerPoint,
+      bet_unit: room.betUnit,
+      is_online: room.isOnline,
     })
     .eq("id", room.id)
     .select()
@@ -127,7 +130,7 @@ export const updateRoom = async (room: Room) => {
 export const findRoomByRoomId = async (
   roomId: string,
 ): Promise<Room | null> => {
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("rooms")
     .select("*")
     .eq("room_id", roomId)
@@ -145,8 +148,8 @@ export const findRoomByRoomId = async (
 
 export const getPlayersFromRoom = async (
   id: number,
-): Promise<string[] | null> => {
-  const { data, error } = await supabase
+): Promise<number[] | null> => {
+  const {data, error} = await supabase
     .from("rooms")
     .select("players")
     .eq("id", id)

@@ -1,7 +1,9 @@
 import { Card } from "../game/shared/cards";
 
 type Player = {
+  id: number,
   socketId: string;
+  name: string;
   hand: Card[];
   buyIn: number;
   gameBalance: number;
@@ -15,7 +17,7 @@ type BaseGameState = {
   currentTurn: string;
   lastPlayed: { socketId: string; cards: Card[] };
   betUnit: number; // The unit of bet for the game, value per card for Sam and other rules for Phom
-  phase: "waiting" | "playing" | "finish";
+  phase: "playing" | "finish";
 };
 
 type SamGameState = BaseGameState & {
