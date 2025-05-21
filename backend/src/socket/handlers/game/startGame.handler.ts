@@ -5,31 +5,31 @@ import { log, toError } from "../../../lib/utils";
 // import { generateDeck, shuffleDeck } from "../../../lib/cards";
 import { Player } from "../../../types/game";
 
-// This is only called when all players are ready and host clicks "Start Game"
+// This is only called when all players are ready and the host clicks "Start Game"
 export const handleStartGame = (io: Server, socket: Socket) => {
   return async (
-    {roomId}: { roomId: string },
+    { roomId }: { roomId: string },
     callback: (response: { success?: boolean; error?: string }) => void
   ) => {
     try {
-      // Check if game already started (via Redis)
+      // Check if the game already started (via Redis)
       const existingState = await getGameState(roomId);
       if (existingState) {
-        callback({error: "Game already started."});
+        callback({ error: "Game already started." });
         return;
       }
 
       // Find room in DB
       const room = await findRoomByRoomId(roomId);
       if (!room) {
-        callback({error: "Room not found."});
+        callback({ error: "Room not found." });
         return;
       }
 
       // Check player count
       const playersInRoom = room.players;
       if (!playersInRoom || playersInRoom.length < 2) {
-        callback({error: "At least 2 players are required to start the game."});
+        callback({ error: "At least 2 players are required to start the game." });
         return;
       }
 
@@ -74,11 +74,11 @@ export const handleStartGame = (io: Server, socket: Socket) => {
 
       // Notify all players
       io.to(roomId).emit("gameStarted", gameState);
-      callback({success: true});
+      callback({ success: true });
     } catch (error: unknown) {
       const err = toError(error);
       log("startGame error", err.message, "error");
-      callback({error: err.message || "Internal server error"});
+      callback({ error: err.message || "Internal server error" });
     }
   };
 };
