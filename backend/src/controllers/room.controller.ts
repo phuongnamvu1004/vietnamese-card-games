@@ -6,32 +6,28 @@ import { CurrentGameState } from "../types/game";
 import { createGameState } from "../redis/gameState";
 
 /**
- * @function createNewRoom
- * @description
- * Express controller for creating a new game room.
- * This includes:
- *  - Validating and parsing player input
- *  - Generating a unique room ID
- *  - Fetching player IDs from email addresses
- *  - Creating a corresponding initial gameState in Redis
- *  - Persisting room metadata in PostgreSQL
- *  - Storing room-user associations (host and invitees)
+ * Creates a new game room.
  *
- * This function assumes that gameplay will start later,
- * and the `gameState` will be updated when players join via socket.
+ * Responsibilities:
+ * - Validates input and generates a unique room ID
+ * - Resolves player emails to user IDs
+ * - Initializes an empty gameState in Redis
+ * - Saves room metadata in PostgreSQL
+ * - Creates room-user associations for host and invited players
+ *
+ * Assumes gameplay will begin later; players will join and update gameState via socket.
  *
  * @route POST /api/room
  * @access Authenticated users only
  *
- * @param req - Express request object, expects:
+ * @param req - Express request with game setup info:
  *    {
  *      gameType: "sam" | "phom",
  *      maxPlayers: number,
  *      buyIn: number,
  *      betUnit: number,
- *      players: string[] // array of invited players' emails
+ *      players: string[] // player emails
  *    }
- *
  * @param res - Express response object
  */
 export const createNewRoom = async (req: Request, res: Response) => {
@@ -67,34 +63,33 @@ export const createNewRoom = async (req: Request, res: Response) => {
       }),
     );
 
+    // Common base game state
+    const baseGameState = {
+      players: [],
+      deck: [],
+      currentTurn: "",
+      lastPlayed: { socketId: "", cards: [] },
+      betUnit,
+      phase: "waiting" as const,
+    };
+
     let newGameState: CurrentGameState;
 
     if (gameType === "sam") {
       newGameState = {
-        players: [],
-        deck: [],
-        currentTurn: "",
-        lastPlayed: { socketId: "", cards: [] },
-        betUnit,
-        phase: "waiting",
+        ...baseGameState,
         gameType: "sam",
         instantWinPlayers: [],
       };
     } else {
       newGameState = {
-        players: [],
-        deck: [],
-        currentTurn: "",
-        lastPlayed: { socketId: "", cards: [] },
-        betUnit,
-        phase: "waiting",
+        ...baseGameState,
         gameType: "phom",
         phomSpecificField: undefined,
       };
     }
 
     await createGameState(roomId, newGameState);
-
     log("Game state created in Redis:", roomId, "info");
 
     // Call createRoom to save the room

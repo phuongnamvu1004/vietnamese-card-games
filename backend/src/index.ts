@@ -5,16 +5,15 @@ import cookieParser from "cookie-parser";
 import { log } from "./lib/utils";
 import { config } from "dotenv";
 
-
 import authRouter from "./routes/auth.routes";
 import userRouter from "./routes/user.routes";
 import roomRouter from "./routes/room.routes";
 
-config({path: ".env.local"});
+config({ path: ".env.local" });
 
 const app = express();
 
-connectDB();
+connectDB()
 
 app.use(cors({
   origin: process.env.FRONTEND_URL, // allow frontend to access
