@@ -5,28 +5,21 @@ import { Card, dealCards, shuffleDeck } from "../../../game/shared/cards";
 import { CurrentGameState } from "../../../types/game";
 
 /**
- * @function handleStartGame
- * @description
- * Socket.io handler invoked when the host clicks "Start Game" after all players have joined.
+ * Handles the host starting the game after all players have joined.
  *
  * Responsibilities:
  * - Validates the current player count.
- * - Generates and shuffles a full deck of cards.
- * - Deals hands to each player based on game type.
- * - Assigns hands and determines the first turn (host starts by default).
- * - Updates the `gameState` in Redis with deck, hands, and current turn.
- * - Emits the `gameStarted` event to all clients in the room with the updated game state.
+ * - Shuffles and deals cards.
+ * - Assigns hands and determines the first turn (host starts).
+ * - Updates the game state in Redis.
+ * - Notifies all players via the "gameStarted" socket event.
  *
- * This function ensures consistent and centralized game initialization
- * and should only be called by the host after all players are ready.
- *
- * @param {Server} io - The Socket.io server instance
- * @param {Socket} socket - The host's socket instance; must have `roomId` in `socket.data`
- *
- * @returns {Function} - An async handler function that triggers the game start logic,
- *                      and responds with a callback:
- *                      - `{ success: true }` on success
- *                      - `{ error: string }` if the game cannot be started
+ * @param io - Socket.io server instance
+ * @param socket - Host's socket instance; must include `roomId` in `socket.data`
+ * @returns An async function triggered by the host that attempts to start the game.
+ *          Calls back with:
+ *          - `{ success: true }` on success
+ *          - `{ error: string }` if the game cannot be started
  */
 export const handleStartGame = (io: Server, socket: Socket) => {
   return async (
