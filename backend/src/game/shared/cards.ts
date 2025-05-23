@@ -64,16 +64,33 @@ export const shuffleDeck = (deck: Card[]): Card[] => {
 export const dealCards = (
   deck: Card[],
   numPlayers: number,
-  cardsPerPlayer: number,
+  gameType: "sam" | "phom"
 ): Card[][] => {
+  // Prepare empty hands for all players
   const hands: Card[][] = Array.from({ length: numPlayers }, () => []);
 
-  for (let i = 0; i < cardsPerPlayer; i++) {
-    for (let p = 0; p < numPlayers; p++) {
-      const card = deck.shift();
-      if (card) hands[p].push(card);
+  if (gameType === "sam") {
+    // Deal 10 cards to every player
+    for (let i = 0; i < 10; i++) {
+      for (let p = 0; p < numPlayers; p++) {
+        const card = deck.shift(); // Remove the top card from the deck
+        if (card) hands[p].push(card); // Add the card to the player's hand
+      }
+    }
+  } else if (gameType === "phom") {
+    // Deal 10 cards to the host and 9 to all other players
+    for (let i = 0; i < 10; i++) {
+      const card = deck.shift(); // Remove the top card from the deck
+      if (card) hands[0].push(card); // Add the card to the host's hand
+      if (i < 9) {
+        // Other players get only 9 cards
+        for (let p = 1; p < numPlayers; p++) {
+          const card = deck.shift(); // Remove the top card
+          if (card) hands[p].push(card); // Add the card to the player's hand
+        }
+      }
     }
   }
 
-  return hands;
+  return hands; // Return the array of player hands
 };

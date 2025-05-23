@@ -13,11 +13,11 @@ type Player = {
 
 type BaseGameState = {
   players: Player[];
-  deck: Card[];
+  deck: Card[]; // Only needed for Phom
   currentTurn: string;
   lastPlayed: { socketId: string; cards: Card[] };
-  betUnit: number; // The unit of bet for the game, value per card for Sam and other rules for Phom
-  phase: "playing" | "finish";
+  betUnit: number; // The unit of a bet for the game, value per card for Sam and other rules for Phom
+  phase: "waiting" | "playing" | "finish";
 };
 
 type SamGameState = BaseGameState & {

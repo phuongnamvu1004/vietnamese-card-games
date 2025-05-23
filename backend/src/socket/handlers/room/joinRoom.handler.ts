@@ -11,7 +11,15 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
       roomId,
       userId,
       playerName,
-    }: { roomId: string; userId: number; playerName: string },
+      buyIn,
+      gameBalance
+    }: {
+      roomId: string;
+      userId: number;
+      playerName: string;
+      buyIn: number;
+      gameBalance: number
+    },
     callback: (response: {
       success?: boolean;
       error?: string;
@@ -49,6 +57,7 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
       }
 
       socket.join(roomId);
+      // Saving roomId into socket data
       socket.data.roomId = roomId;
 
       const gameState = await getGameState(roomId);
@@ -62,7 +71,9 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
         socketId: socket.id,
         name: playerName,
         hand: [],
-        gameBalance: 0,
+        buyIn,
+        gameBalance,
+        mustBeat: false,
         state: "waitingForTurn",
       });
 

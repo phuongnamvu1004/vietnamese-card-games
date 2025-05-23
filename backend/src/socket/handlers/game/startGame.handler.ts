@@ -1,76 +1,87 @@
 import { Server, Socket } from "socket.io";
-import { createGameState, getGameState } from "../../../redis/gameState";
-import { findRoomByRoomId, updateRoom } from "../../../models/room.model";
+import { getGameState, updateGameState } from "../../../redis/gameState";
 import { log, toError } from "../../../lib/utils";
-// import { generateDeck, shuffleDeck } from "../../../lib/cards";
-import { Player } from "../../../types/game";
+import { Card, dealCards, shuffleDeck } from "../../../game/shared/cards";
+import { CurrentGameState } from "../../../types/game";
 
-// This is only called when all players are ready and the host clicks "Start Game"
+/**
+ * @function handleStartGame
+ * @description
+ * Socket.io handler invoked when the host clicks "Start Game" after all players have joined.
+ *
+ * Responsibilities:
+ * - Validates the current player count.
+ * - Generates and shuffles a full deck of cards.
+ * - Deals hands to each player based on game type.
+ * - Assigns hands and determines the first turn (host starts by default).
+ * - Updates the `gameState` in Redis with deck, hands, and current turn.
+ * - Emits the `gameStarted` event to all clients in the room with the updated game state.
+ *
+ * This function ensures consistent and centralized game initialization
+ * and should only be called by the host after all players are ready.
+ *
+ * @param {Server} io - The Socket.io server instance
+ * @param {Socket} socket - The host's socket instance; must have `roomId` in `socket.data`
+ *
+ * @returns {Function} - An async handler function that triggers the game start logic,
+ *                      and responds with a callback:
+ *                      - `{ success: true }` on success
+ *                      - `{ error: string }` if the game cannot be started
+ */
 export const handleStartGame = (io: Server, socket: Socket) => {
   return async (
-    { roomId }: { roomId: string },
     callback: (response: { success?: boolean; error?: string }) => void
   ) => {
     try {
-      // Check if the game already started (via Redis)
-      const existingState = await getGameState(roomId);
-      if (existingState) {
-        callback({ error: "Game already started." });
+      const roomId: string = socket.data.roomId;
+
+      // Fetch current game state from Redis
+      let gameState: CurrentGameState = await getGameState(roomId);
+      if (!gameState) {
+        callback({ error: "Game state not found or expired." });
         return;
       }
 
-      // Find room in DB
-      const room = await findRoomByRoomId(roomId);
-      if (!room) {
-        callback({ error: "Room not found." });
-        return;
-      }
+      const players = gameState.players;
+      const numPlayers = players.length;
 
-      // Check player count
-      const playersInRoom = room.players;
-      if (!playersInRoom || playersInRoom.length < 2) {
+      if (numPlayers < 2) {
         callback({ error: "At least 2 players are required to start the game." });
         return;
       }
 
-      // Prepare players for game state
-      const gamePlayers: Player[] = playersInRoom.map((userId) => ({
-        id: userId,
-        name: "",         // TODO: fetch player name if needed
-        socketId: "",     // TODO: optionally map socketId here if tracked
-        hand: [],
-        gameBalance: 0,
-        state: "waitingForTurn",
-      }));
+      // Create and shuffle deck
+      const deck = shuffleDeck(Card.createDeck());
+      const hands = dealCards(deck, numPlayers, gameState.gameType);
 
-      /// TODO: FIX THE BELOW COMMENTED LINES
+      if (hands.length !== numPlayers) {
+        callback({ error: "Card dealing failed due to hand mismatch." });
+        return;
+      }
 
-      // // Shuffle deck
-      // const deck = shuffleDeck(generateDeck(room.gameType));
-      //
-      // // Choose first player (simple round-robin: first in list)
-      // const currentTurn = gamePlayers[0].socketId;
-      //
-      // // Build game state object
-      // const gameState: CurrentGameState = {
-      //   players: gamePlayers,
-      //   deck,
-      //   currentTurn,
-      //   lastPlayed: {socketId: "", cards: []},
-      //   betUnit: room.betUnit,
-      //   phase: "playing",
-      //   gameType: room.gameType,
-      //   ...(room.gameType === "sam"
-      //     ? {instantWinPlayers: []}
-      //     : {phomSpecificField: undefined}),
-      // };
+      // Assign hands and determine the first turn (host starts)
+      let currentTurnSocketId: string | undefined;
+      let handIndex = 0;
 
-      // Save game state in Redis
-      await createGameState(roomId, gameState);
+      for (const player of players) {
+        if (player.socketId === socket.id) {
+          currentTurnSocketId = player.socketId;
+          player.hand = hands[0]; // Host gets first hand
+        } else {
+          handIndex++;
+          player.hand = hands[handIndex];
+        }
+      }
 
-      // Mark room as online in DB
-      room.isOnline = true;
-      await updateRoom(room);
+      // Update game state
+      gameState = {
+        ...gameState,
+        players,
+        deck,
+        currentTurn: currentTurnSocketId!,
+      };
+
+      await updateGameState(roomId, gameState);
 
       // Notify all players
       io.to(roomId).emit("gameStarted", gameState);
