@@ -1,4 +1,4 @@
-import { supabase } from "../database/db";
+import { supabase } from "../database";
 import { log } from "../lib/utils";
 
 export interface UserStatisticsSam {

@@ -60,7 +60,7 @@ export const handlePlayCard = (io: Server, socket: Socket) => {
           finalState: updatedGameState,
         });
       } else {
-        // Notify all players about updated game state
+        // Notify all players about the updated game state
         io.to(roomId).emit("gameStateUpdate", {
           players: updatedGameState.players,
           currentTurn: updatedGameState.currentTurn,

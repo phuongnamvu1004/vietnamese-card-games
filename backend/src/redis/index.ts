@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { RedisStore } from "connect-redis"; // ✅ Named import
+import { RedisStore } from "connect-redis";
 import { config } from "dotenv";
 import { log } from "../lib/utils";
 
@@ -17,7 +17,7 @@ redisClient.on("error", (err) => {
   log("Redis Client Error:", err, "error");
 });
 
-// ✅ Create and return session store
+// ✅ Create and return the session store
 export const createNewSessionStore = () => {
   return new RedisStore({
     client: redisClient,

@@ -1,5 +1,5 @@
 // models/user.model.ts
-import { supabase } from "../database/db";
+import { supabase } from "../database";
 import { log } from "../lib/utils";
 
 export interface User {
@@ -44,7 +44,7 @@ export const createUser = async (user: {
   password: string;
   profilePic?: string;
 }): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .insert([
       {
@@ -67,7 +67,7 @@ export const createUser = async (user: {
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("email", email)
@@ -85,9 +85,9 @@ export const updateUserProfilePic = async (
   userId: number,
   profilePicUrl: string,
 ): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
-    .update({profile_pic: profilePicUrl})
+    .update({ profile_pic: profilePicUrl })
     .eq("id", userId)
     .select()
     .single();
@@ -98,7 +98,7 @@ export const updateUserProfilePic = async (
 };
 
 export const getUserById = async (id: number): Promise<SafeUser | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("id, email, full_name, profile_pic, created_at, updated_at")
     .eq("id", id)

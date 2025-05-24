@@ -1,5 +1,5 @@
 // models/room.model.ts
-import { supabase } from "../database/db";
+import { supabase } from "../database";
 import { log } from "../lib/utils";
 
 export interface Room {
@@ -58,7 +58,7 @@ export const createRoom = async (room: {
   buyIn: number;
   betUnit: number;
 }) => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("rooms")
     .insert([
       {
@@ -83,7 +83,7 @@ export const createRoom = async (room: {
 };
 
 export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("room_players")
     .insert([
       {
@@ -103,7 +103,7 @@ export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
 };
 
 export const updateRoom = async (room: Room) => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("rooms")
     .update({
       room_id: room.roomId,
@@ -130,7 +130,7 @@ export const updateRoom = async (room: Room) => {
 export const findRoomByRoomId = async (
   roomId: string,
 ): Promise<Room | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("rooms")
     .select("*")
     .eq("room_id", roomId)
@@ -149,7 +149,7 @@ export const findRoomByRoomId = async (
 export const getPlayersFromRoom = async (
   id: number,
 ): Promise<number[] | null> => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("rooms")
     .select("players")
     .eq("id", id)
