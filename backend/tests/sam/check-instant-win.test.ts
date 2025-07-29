@@ -1,7 +1,7 @@
 import {
   checkInstantWin,
   InstantWinType,
-} from "../../src/game/sam/rules/checkInstantWin";
+} from "../../src/game/sam/rules/check-instant-win";
 import { Card, Suit } from "../../src/game/shared/cards";
 
 describe("checkInstantWin test", () => {

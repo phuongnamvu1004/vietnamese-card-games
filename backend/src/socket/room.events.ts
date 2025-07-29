@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { handleJoinRoom } from "./handlers/room/joinRoom.handler";
-import { handleLeaveRoom } from "./handlers/room/leaveRoom.handler";
+import { handleJoinRoom } from "./handlers/room/join-room.handler";
+import { handleLeaveRoom } from "./handlers/room/leave-room.handler";
 
 export const setupRoomEvents = (io: Server, socket: Socket) => {
   socket.on("joinRoom", handleJoinRoom(io, socket));

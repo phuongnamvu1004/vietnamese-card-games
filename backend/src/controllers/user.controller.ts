@@ -5,7 +5,7 @@ import { updateUserProfilePic } from "../models/user.model";
 import {
   getUserStatisticsPhomByUserId,
   getUserStatisticsSamByUserId,
-} from "../models/userStatistics.model";
+} from "../models/user-statistics.model";
 
 export const updateProfile = async (
   req: Request,

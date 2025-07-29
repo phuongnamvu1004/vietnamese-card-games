@@ -2,7 +2,7 @@ import { Card, Suit } from "../../src/game/shared/cards";
 import {
   MoveStatus,
   validateMove,
-} from "../../src/game/sam/rules/validateMove";
+} from "../../src/game/sam/rules/validate-move";
 
 describe("validateMove test", () => {
   test("Validate move: Single", () => {

@@ -1,5 +1,5 @@
-import { getNextPlayer, getPreviousPlayer } from "../../src/game/sam/helpers/getPlayer";
-import { playCard } from "../../src/game/sam/gameEngine";
+import { getNextPlayer, getPreviousPlayer } from "../../src/game/sam/helpers/get-player";
+import { playCard } from "../../src/game/sam/game-engine";
 import { CurrentGameState, Player } from "../../src/types/game";
 import { Card, Suit } from "../../src/game/shared/cards";
 

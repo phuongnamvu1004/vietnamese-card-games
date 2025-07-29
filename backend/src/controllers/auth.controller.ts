@@ -7,7 +7,7 @@ import { createUser, findUserByEmail } from "../models/user.model";
 import {
   initializeUserStatisticsPhom,
   initializeUserStatisticsSam,
-} from "../models/userStatistics.model";
+} from "../models/user-statistics.model";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body;
@@ -45,14 +45,15 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       profilePic: "", // default profile pic
     });
 
-    await initializeUserStatisticsSam(newUser!.id);
-    await initializeUserStatisticsPhom(newUser!.id);
-
     if (!newUser) {
       log("Invalid user data", "warn");
       res.status(400).json({ message: "Invalid user data" });
       return;
     }
+
+    await initializeUserStatisticsSam(newUser!.id);
+    await initializeUserStatisticsPhom(newUser!.id);
+
 
     // generate jwt token
     generateToken(newUser.id.toString(), res);

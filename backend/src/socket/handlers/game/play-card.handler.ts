@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { Card } from "../../../game/shared/cards";
-import { getGameState, updateGameState } from "../../../redis/gameState";
-import { playCard } from "../../../game/sam/gameEngine";
+import { getGameState, updateGameState } from "../../../redis/game-state";
+import { playCard } from "../../../game/sam/game-engine";
 import { Player } from "../../../types/game";
 import { log } from "../../../lib/utils";
 

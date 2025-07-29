@@ -3,7 +3,7 @@ import { createRoom, createRoomPlayer } from "../models/room.model";
 import { generateRoomId, log, toError } from "../lib/utils";
 import { findUserByEmail } from "../models/user.model";
 import { CurrentGameState } from "../types/game";
-import { createGameState } from "../redis/gameState";
+import { createGameState } from "../redis/game-state";
 
 /**
  * Creates a new game room.

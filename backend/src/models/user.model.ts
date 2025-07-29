@@ -51,8 +51,7 @@ export const createUser = async (user: {
         email: user.email,
         full_name: user.fullName,
         password: user.password,
-        profile_pic: user.profilePic || "",
-        balance: 0,
+        profile_pic: user.profilePic || ""
       },
     ])
     .select()
@@ -71,7 +70,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
     .from("users")
     .select("*")
     .eq("email", email)
-    .single();
+    .maybeSingle();
 
   if (error) {
     log("findUserByEmail error:", error, "error");

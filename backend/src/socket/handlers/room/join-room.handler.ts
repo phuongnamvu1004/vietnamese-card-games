@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { createRoomPlayer, findRoomByRoomId, getPlayersFromRoom, updateRoom } from "../../../models/room.model";
 import { log, toError } from "../../../lib/utils";
-import { getGameState, updateGameState } from "../../../redis/gameState";
+import { getGameState, updateGameState } from "../../../redis/game-state";
 import { getUserById } from "../../../models/user.model";
 import { CurrentGameState } from "../../../types/game";
 
