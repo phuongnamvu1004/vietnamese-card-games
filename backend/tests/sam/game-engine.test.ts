@@ -25,12 +25,14 @@ const failedCard = new Card(Suit.Spade, 9);
 
 // Helper to create mock player
 const createPlayer = (id: string, hand: Card[], mustBeat = false): Player => ({
+  id: 9999,
   socketId: id,
+  name: "",
   hand,
   buyIn: 1000,
   gameBalance: 1000,
   mustBeat,
-  state: "waitingForTurn",
+  state: "waitingForTurn"
 });
 
 let baseGameState: CurrentGameState = {

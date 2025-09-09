@@ -26,25 +26,25 @@ describe("CardDisplay class test", () => {
     expect(shuffledDeck).not.toEqual(deck);
   });
 
-  test("Deal cards", () => {
+  test("Deal cards sam", () => {
     const deck = Card.createDeck();
     const shuffledDeck = shuffleDeck(deck);
-    const hands = dealCards(shuffledDeck, 4, 5);
+    const hands = dealCards(shuffledDeck, 4, "sam");
     expect(hands.length).toBe(4);
-    expect(hands[0].length).toBe(5);
-    expect(hands[1].length).toBe(5);
-    expect(hands[2].length).toBe(5);
-    expect(hands[3].length).toBe(5);
+    expect(hands[0].length).toBe(10);
+    expect(hands[1].length).toBe(10);
+    expect(hands[2].length).toBe(10);
+    expect(hands[3].length).toBe(10);
   });
 
-  test("Deal cards with insufficient deck", () => {
+  test("Deal cards phom", () => {
     const deck = Card.createDeck();
     const shuffledDeck = shuffleDeck(deck);
-    const hands = dealCards(shuffledDeck, 4, 20);
+    const hands = dealCards(shuffledDeck, 4, "phom");
     expect(hands.length).toBe(4);
-    expect(hands[0].length).toBe(13);
-    expect(hands[1].length).toBe(13);
-    expect(hands[2].length).toBe(13);
-    expect(hands[3].length).toBe(13);
-  });
+    expect(hands[0].length).toBe(10); // the host's hand has 10 cards
+    expect(hands[1].length).toBe(9);
+    expect(hands[2].length).toBe(9);
+    expect(hands[3].length).toBe(9);
+  })
 });
