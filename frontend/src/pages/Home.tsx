@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
-import Neonbutton from "../Components/ui/Neonbutton";
+import Neonbutton from "../Components/ui/NeonButton.tsx";
 import PokerChip from "../Components/ui/PokerChip";
 
 const Home: React.FC = () => {

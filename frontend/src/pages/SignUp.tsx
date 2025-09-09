@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
 import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import Neonbutton from "../Components/ui/Neonbutton";
+import Neonbutton from "../Components/ui/NeonButton.tsx";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
 import { axiosInstance } from "../lib/axios";

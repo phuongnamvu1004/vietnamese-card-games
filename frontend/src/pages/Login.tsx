@@ -4,7 +4,7 @@ import { axiosInstance } from "../lib/axios";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
 import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import Neonbutton from "../Components/ui/Neonbutton";
+import Neonbutton from "../Components/ui/NeonButton.tsx";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
 
