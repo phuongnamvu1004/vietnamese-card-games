@@ -5,6 +5,13 @@ import { getGameState, updateGameState } from "../../../redis/game-state";
 import { getUserById } from "../../../models/user.model";
 import { CurrentGameState } from "../../../types/game";
 
+type JoinRoomRequest = {
+  roomId: string;
+  userId: number;
+  playerName: string;
+  buyIn: number;
+  gameBalance: number;
+}
 export const handleJoinRoom = (io: Server, socket: Socket) => {
   return async (
     {
@@ -13,13 +20,7 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
       playerName,
       buyIn,
       gameBalance
-    }: {
-      roomId: string;
-      userId: number;
-      playerName: string;
-      buyIn: number;
-      gameBalance: number
-    },
+    }: JoinRoomRequest,
     callback: (response: {
       success?: boolean;
       error?: string;

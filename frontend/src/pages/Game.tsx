@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Layout/Navbar";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
-import Neonbutton from "../Components/ui/Neonbutton";
+import NeonButton from "../Components/ui/NeonButton.tsx";
 import { axiosInstance } from "../lib/axios";
 
 const Game: React.FC = () => {
-  const [user, setUser] = useState<null | {
+  const [, setUser] = useState<null | {
     fullName: string;
     profilePicture: string;
   }>(null);
@@ -43,13 +43,13 @@ const Game: React.FC = () => {
 
         {/* Game Mode Buttons */}
         <div className="flex flex-col gap-8 w-80">
-          <Neonbutton to="/game/sam" color="cyan" fullWidth size="lg">
+          <NeonButton to="/game/sam" color="cyan" fullWidth size="lg">
             Play Sâm
-          </Neonbutton>
+          </NeonButton>
 
-          <Neonbutton to="/game/phom" color="pink" fullWidth size="lg">
+          <NeonButton to="/game/phom" color="pink" fullWidth size="lg">
             Play Phỏm
-          </Neonbutton>
+          </NeonButton>
         </div>
 
         {/* Footer */}
