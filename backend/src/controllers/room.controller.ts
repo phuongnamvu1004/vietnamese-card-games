@@ -102,8 +102,7 @@ export const createNewRoom = async (req: Request, res: Response) => {
       buyIn: buyIn,
       betUnit: betUnit,
     });
-    // Send success response
-    log("Room created successfully:", roomId, "info");
+    if (newRoom) log("Room created successfully:", roomId, "info");
 
     // create room-user key pairs for the host and the other players
     await createRoomPlayer({
