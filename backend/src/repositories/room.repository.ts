@@ -1,17 +1,10 @@
 import { supabase } from "../databases/supabase";
 import { log } from "../lib/utils/logger";
 import { mapRoomData, mapRoomPlayerData } from "../mappers/room.mapper";
-import { Room, RoomPlayer } from "../entities/room";
+import { Room } from "../entities/room";
+import { CreateRoomPlayerRepoDTO, CreateRoomRepoDTO } from "../dtos/room.dto";
 
-export const createRoom = async (room: {
-  roomId: string;
-  hostUserId: number;
-  gameType: "sam" | "phom";
-  maxPlayers: number;
-  players: number[];
-  buyIn: number;
-  betUnit: number;
-}) => {
+export const createRoom = async (room: CreateRoomRepoDTO) => {
   const { data, error } = await supabase
     .from("rooms")
     .insert([
@@ -20,7 +13,6 @@ export const createRoom = async (room: {
         host_user_id: room.hostUserId,
         game_type: room.gameType,
         max_players: room.maxPlayers,
-        players: room.players,
         buy_in: room.buyIn,
         bet_unit: room.betUnit,
       },
@@ -36,7 +28,13 @@ export const createRoom = async (room: {
   return mapRoomData(data);
 };
 
-export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
+export const createRoomPlayer = async (roomPlayer: CreateRoomPlayerRepoDTO) => {
+  let joined_at: Date | null = null; // default for other players when create room
+  // Only let joined_at be set if the player is the host,
+  if (roomPlayer.status === "host") {
+    joined_at = new Date();
+  }
+
   const { data, error } = await supabase
     .from("room_players")
     .insert([
@@ -45,8 +43,8 @@ export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
         user_id: roomPlayer.userId,
         status: roomPlayer.status,
         invited_by: roomPlayer.invitedBy,
-        invited_at: roomPlayer.invitedAt,
-        joined_at: roomPlayer.joinedAt,
+        invited_at: new Date(),
+        joined_at
       },
     ])
     .select()
@@ -104,14 +102,31 @@ export const findRoomByRoomId = async (
   return mapRoomData(data);
 };
 
-export const getPlayersFromRoom = async (
-  id: number,
-): Promise<number[] | null> => {
+export const getRoomIdById = async (
+  id: number
+): Promise<number | null> => {
   const { data, error } = await supabase
     .from("rooms")
-    .select("players")
+    .select("room_id")
     .eq("id", id)
     .single();
+
+  if (error) {
+    log("Error finding room by id:", error, "error");
+    return null;
+  }
+
+  return data.room_id
+}
+
+export const getJoinedPlayersFromRoom = async (
+  roomId: number,
+) => {
+  const { data, error } = await supabase
+    .from("room_players")
+    .select("user_id")
+    .eq("room_id", roomId)
+    .in("status", ["joined"]);
 
   if (error) {
     log("Error finding room:", error, "error");
@@ -119,5 +134,30 @@ export const getPlayersFromRoom = async (
   }
 
   log("getRoomPlayers:", data, "info");
-  return data.players;
+  return data?.map((player) => player.user_id) || [];
 };
+
+export const updateRoomPlayerStatus = async (
+  roomId: number,
+  userId: number,
+  status: "joined" | "left" | "kicked",
+)=> {
+  const { data, error } = await supabase
+    .from("room_players")
+    .update({
+      status: status,
+      joined_at: new Date()
+    })
+    .eq("room_id", roomId)
+    .eq("user_id", userId)
+    .select("*")
+    .single();
+
+  if (error) {
+    log("Error updating room player status:", error, "error");
+    return null;
+  }
+
+  log("updateRoomPlayerStatus:", data, "info");
+  return mapRoomPlayerData(data);
+}

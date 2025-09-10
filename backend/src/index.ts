@@ -6,9 +6,17 @@ import { log } from "./lib/utils/logger";
 import { config } from "dotenv";
 import session from "express-session";
 import { createNewSessionStore } from "./databases/redis";
+
+// Routes
 import authRouter from "./routes/auth.routes";
 import userRouter from "./routes/user.routes";
 import roomRouter from "./routes/room.routes";
+import invitationRouter from "./routes/invitation.routes";
+
+// Socket.io
+import http from "http";
+import { Server } from "socket.io";
+import { initSocketServer } from "./socket";
 
 config({ path: process.env.DOTENV_PATH || ".env.local" }); // Dynamic dotenv path
 
@@ -18,14 +26,9 @@ const app = express();
 const bootstrap = async () => {
   try {
     // Test database connection
-    log("Testing database connection...", "info");
+    log("Testing Supabase connection...", "info");
     await testDatabaseConnection();
-    log("Database connection successful!", "info");
-
-    // Test Redis connection (Optional)
-    log("Testing Redis connection...", "info");
-    createNewSessionStore(); // Assuming this handles Redis connection issues internally
-    log("Redis connection successful!", "info");
+    log("Supabase connection successful!", "info");
 
     // Middleware configuration
     app.use(cors({
@@ -53,10 +56,22 @@ const bootstrap = async () => {
     app.use("/api/auth", authRouter);
     app.use("/api/user", userRouter);
     app.use("/api/room", roomRouter);
+    app.use("/api/invitation", invitationRouter);
 
     // Start the server only after all successful initializations
+    const httpServer = http.createServer(app);
+
+    // Create a socket.io server
+    const io = new Server(httpServer, {
+      cors: {
+        origin: process.env.FRONTEND_URL,
+        credentials: true,
+      },
+    });
+    initSocketServer(io);
+
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       log(`Server is listening on port ${PORT}`, "info");
     });
   } catch (error) {

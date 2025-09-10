@@ -1,11 +1,19 @@
 import { Server, Socket } from "socket.io";
-import { createRoomPlayer, findRoomByRoomId, getPlayersFromRoom, updateRoom } from "../../../repositories/room.repository";
+import { findRoomByRoomId, getJoinedPlayersFromRoom, updateRoomPlayerStatus} from "../../../repositories/room.repository";
 import { log } from "../../../lib/utils/logger";
 import { toError } from "../../../lib/utils/errors-handlers";
 import { getGameState, updateGameState } from "../../../databases/redis/game-state";
 import { getUserById } from "../../../repositories/user.repository";
 import { CurrentGameState } from "../../../types/game";
 
+// TODO: Rework the parameters for joinRoom to be more secure:
+/*
+You already fetch the user and room on the server and check balances. You should not trust client-provided userId/playerName/buyIn/gameBalance. Instead:
+	•	Derive userId from socket.data.userId, not from the payload
+	•	Derive playerName from DB (user.name or similar)
+	•	Derive buyIn from room.buyIn
+	•	Compute/validate gameBalance server-side (or drop it from player state if you don’t truly need it in Redis)
+ */
 type JoinRoomRequest = {
   roomId: string;
   userId: number;
@@ -37,14 +45,19 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
         return;
       }
 
-      const currentPlayers: number[] | null = await getPlayersFromRoom(room.id);
-      if (currentPlayers && currentPlayers.length >= room.maxPlayers) {
+      const currentPlayers: number[] | null = await getJoinedPlayersFromRoom(room.id);
+      if (!currentPlayers) {
+        log("Could not retrieve current players", "error");
+        callback({ error: "Could not retrieve current players" });
+        return;
+      }
+      if (currentPlayers.length >= room.maxPlayers) { // never happens to a host since he will be the one joining the room first and maxPlayers > 1
         log("Room is full", "warn");
         callback({ error: "Room is full" });
         return;
       }
 
-      const alreadyJoined = currentPlayers?.includes(userId);
+      const alreadyJoined = currentPlayers.includes(userId);
       if (alreadyJoined) {
         log("User already in the room", "warn");
         callback({ error: "User already in the room" });
@@ -52,7 +65,12 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
       }
 
       const user = await getUserById(userId);
-      if (!user || user.balance < room.buyIn) {
+      if (!user) {
+        log("User not found", "warn");
+        callback({ error: "User not found" });
+        return;
+      }
+      if (user.balance < room.buyIn) {
         log("User does not have enough balance", "warn");
         callback({ error: "User does not have enough balance" });
         return;
@@ -81,13 +99,12 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
 
       await updateGameState(roomId, gameState);
 
-      // Check for the case when the room creator joins the room (which has already been added to player list)
-      if (!room.players.includes(userId)) {
-        room.players.push(userId);
+      const updatedRoomPlayerStatus = await updateRoomPlayerStatus(room.id, userId, "joined");
+      if (!updatedRoomPlayerStatus) {
+        log("Could not update room player status", "error");
+        callback({ error: "Could not update room player status" });
+        return;
       }
-
-      await updateRoom(room);
-      // await createRoomPlayer({ roomId: room.id, userId });
 
       log("Add user", userId, "to room:", room.id, "info");
 
@@ -101,7 +118,6 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
         isHost,
         gameState,
       });
-
     } catch (error: unknown) {
       const err = toError(error);
       console.error("joinRoom error:", err);

@@ -2,18 +2,19 @@ import { supabase } from "../databases/supabase";
 import { log } from "../lib/utils/logger";
 import { mapSafeUserData, mapUserData } from "../mappers/user.mapper";
 import { User } from "../entities/user"
-import { CreateUserDTO } from "../dtos/user.dto"
+import { CreateUserRepoDTO } from "../dtos/user.dto"
 import { SafeUser } from "../mappers/user.mapper"
 
-export const createUser = async (user: CreateUserDTO): Promise<SafeUser | null> => {
+export const createUser = async (user: CreateUserRepoDTO): Promise<SafeUser | null> => {
   const { data, error } = await supabase
     .from("users")
     .insert([
       {
         email: user.email,
         full_name: user.fullName,
-        password: user.password,
-        profile_pic: user.profilePic || ""
+        password: user.hashedPassword,
+        profile_pic: "", // default by empty profile pic <-> change later when updating profile
+        balance: 0,
       },
     ])
     .select()
@@ -25,6 +26,21 @@ export const createUser = async (user: CreateUserDTO): Promise<SafeUser | null> 
   }
 
   return mapSafeUserData(data);
+};
+
+export const findUserById = async (id: number): Promise<User | null> => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    log("findUserById error:", error, "error");
+    return null;
+  }
+
+  return mapUserData(data);
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
@@ -61,7 +77,7 @@ export const updateUserProfilePic = async (
 export const getUserById = async (id: number): Promise<SafeUser | null> => {
   const { data, error } = await supabase
     .from("users")
-    .select("id, email, full_name, profile_pic, created_at, updated_at")
+    .select("id, email, full_name, profile_pic, balance, created_at, updated_at")
     .eq("id", id)
     .single();
 
