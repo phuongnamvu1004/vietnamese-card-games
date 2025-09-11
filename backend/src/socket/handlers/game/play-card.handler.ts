@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { Card } from "../../../game/shared/cards";
-import { getGameState, updateGameState } from "../../../redis/game-state";
+import { getGameState, updateGameState } from "../../../databases/redis/game-state";
 import { playCard } from "../../../game/sam/game-engine";
 import { Player } from "../../../types/game";
-import { log } from "../../../lib/utils";
+import { log } from "../../../lib/utils/logger";
 
 export const handlePlayCard = (io: Server, socket: Socket) => {
   return async (card: Card[]) => {

@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { getGameState, updateGameState } from "../../../redis/game-state";
-import { log, toError } from "../../../lib/utils";
+import { getGameState, updateGameState } from "../../../databases/redis/game-state";
+import { log } from "../../../lib/utils/logger";
+import { toError } from "../../../lib/utils/errors-handlers";
 import { Card, dealCards, shuffleDeck } from "../../../game/shared/cards";
 import { CurrentGameState } from "../../../types/game";
 

@@ -1,49 +1,11 @@
-// models/user.model.ts
-import { supabase } from "../database";
-import { log } from "../lib/utils";
+import { supabase } from "../databases/supabase";
+import { log } from "../lib/utils/logger";
+import { mapSafeUserData, mapUserData } from "../mappers/user.mapper";
+import { User } from "../entities/user"
+import { CreateUserDTO } from "../dtos/user.dto"
+import { SafeUser } from "../mappers/user.mapper"
 
-export interface User {
-  id: number;
-  email: string;
-  fullName: string;
-  password: string;
-  profilePic?: string;
-  balance: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type SafeUser = Omit<User, "password">;
-
-export const mapUserData = (data: Record<string, unknown>): User => ({
-  id: Number(data.id),
-  email: String(data.email),
-  fullName: String(data.full_name),
-  password: String(data.password),
-  profilePic:
-    typeof data.profile_pic === "string" ? data.profile_pic : undefined,
-  balance: Number(data.balance),
-  createdAt: String(data.created_at),
-  updatedAt: String(data.updated_at),
-});
-
-export const mapSafeUserData = (data: Record<string, unknown>): SafeUser => ({
-  id: Number(data.id),
-  email: String(data.email),
-  fullName: String(data.full_name),
-  profilePic:
-    typeof data.profile_pic === "string" ? data.profile_pic : undefined,
-  balance: Number(data.balance),
-  createdAt: String(data.created_at),
-  updatedAt: String(data.updated_at),
-});
-
-export const createUser = async (user: {
-  email: string;
-  fullName: string;
-  password: string;
-  profilePic?: string;
-}): Promise<SafeUser | null> => {
+export const createUser = async (user: CreateUserDTO): Promise<SafeUser | null> => {
   const { data, error } = await supabase
     .from("users")
     .insert([

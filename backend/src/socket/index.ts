@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { setupRoomEvents } from "./room.events";
 import { setupGameEvents } from "./game.events";
-import { log } from "../lib/utils";
+import { log } from "../lib/utils/logger";
 
 export const initSocketServer = (io: Server) => {
   io.on("connection", (socket) => {

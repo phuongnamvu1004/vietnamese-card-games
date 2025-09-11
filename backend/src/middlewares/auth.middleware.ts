@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { config } from "dotenv";
-import { log } from "../lib/utils";
-import { getUserById } from "../models/user.model";
+import { log } from "../lib/utils/logger";
+import { getUserById } from "../repositories/user.repository";
 
 config({path: ".env.local"});
 
