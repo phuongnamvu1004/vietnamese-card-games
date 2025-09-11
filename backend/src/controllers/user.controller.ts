@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { log } from "../lib/utils";
+import { log } from "../lib/utils/logger";
 import cloudinary from "../lib/cloudinary";
-import { updateUserProfilePic } from "../models/user.model";
+import { updateUserProfilePic } from "../repositories/user.repository";
 import {
   getUserStatisticsPhomByUserId,
   getUserStatisticsSamByUserId,
-} from "../models/user-statistics.model";
+} from "../repositories/user-statistics.repository";
 
 export const updateProfile = async (
   req: Request,

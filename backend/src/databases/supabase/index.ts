@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { log } from "../lib/utils.js";
+import { log } from "../../lib/utils/logger";
 
 import { config } from "dotenv";
 

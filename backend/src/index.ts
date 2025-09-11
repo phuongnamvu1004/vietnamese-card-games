@@ -1,11 +1,11 @@
 import express from "express";
 import cors from "cors";
-import { testDatabaseConnection } from "./database"; // Updated to use `testDatabaseConnection`
+import { testDatabaseConnection } from "./databases/supabase"; // Updated to use `testDatabaseConnection`
 import cookieParser from "cookie-parser";
-import { log } from "./lib/utils";
+import { log } from "./lib/utils/logger";
 import { config } from "dotenv";
 import session from "express-session";
-import { createNewSessionStore } from "./redis";
+import { createNewSessionStore } from "./databases/redis";
 import authRouter from "./routes/auth.routes";
 import userRouter from "./routes/user.routes";
 import roomRouter from "./routes/room.routes";

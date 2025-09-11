@@ -1,5 +1,5 @@
 import redisClient from "./index";
-import { CurrentGameState } from "../types/game";
+import { CurrentGameState } from "../../types/game";
 
 const getGameStateKey = (roomId: string) => `gameState:${roomId}`;
 

@@ -1,53 +1,7 @@
-// models/room.model.ts
-import { supabase } from "../database";
-import { log } from "../lib/utils";
-
-export interface Room {
-  id: number;
-  roomId: string;
-  hostUserId: number;
-  gameType: "sam" | "phom";
-  maxPlayers: number;
-  players: number[]; // user ID
-  buyIn: number;
-  betUnit: number;
-  isOnline: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export const mapRoomData = (data: Record<string, unknown>): Room => ({
-  id: Number(data.id),
-  roomId: String(data.room_id),
-  hostUserId: Number(data.host_user_id),
-  gameType: data.game_type === "phom" ? "phom" : "sam", // validate enum
-  maxPlayers: Number(data.max_players),
-  players: Array.isArray(data.players) ? (data.players as number[]) : [],
-  buyIn: Number(data.buy_in),
-  betUnit: Number(data.bet_unit),
-  isOnline: Boolean(data.is_online),
-  createdAt: String(data.created_at),
-  updatedAt: String(data.updated_at),
-});
-
-export interface RoomPlayer {
-  roomId: number;
-  userId: number;
-}
-
-export const mapRoomPlayerData = (
-  data: Record<string, unknown>,
-): RoomPlayer => ({
-  roomId: Number(data.room_id),
-  userId: Number(data.user_id),
-});
-
-// export interface GameLogEntry {
-//   roomId: number;
-//   playerId: number;
-//   action: string;
-//   timestamp: string;
-// }
+import { supabase } from "../databases/supabase";
+import { log } from "../lib/utils/logger";
+import { mapRoomData, mapRoomPlayerData } from "../mappers/room.mapper";
+import { Room, RoomPlayer } from "../entities/room";
 
 export const createRoom = async (room: {
   roomId: string;
@@ -89,6 +43,10 @@ export const createRoomPlayer = async (roomPlayer: RoomPlayer) => {
       {
         room_id: roomPlayer.roomId,
         user_id: roomPlayer.userId,
+        status: roomPlayer.status,
+        invited_by: roomPlayer.invitedBy,
+        invited_at: roomPlayer.invitedAt,
+        joined_at: roomPlayer.joinedAt,
       },
     ])
     .select()

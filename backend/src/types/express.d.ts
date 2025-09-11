@@ -1,5 +1,5 @@
 // types/express.d.ts
-import { SafeUser } from "../models/user.model";
+import { SafeUser } from "../mappers/user.mapper";
 
 declare global {
   namespace Express {

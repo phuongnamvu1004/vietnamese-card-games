@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 
-import { generateToken, log } from "../lib/utils";
+import { generateToken } from "../lib/utils/generators";
+import { log } from "../lib/utils/logger";
 
-import { createUser, findUserByEmail } from "../models/user.model";
+import { createUser, findUserByEmail } from "../repositories/user.repository";
 import {
   initializeUserStatisticsPhom,
   initializeUserStatisticsSam,
-} from "../models/user-statistics.model";
+} from "../repositories/user-statistics.repository";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body;

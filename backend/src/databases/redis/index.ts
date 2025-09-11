@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import { RedisStore } from "connect-redis";
 import { config } from "dotenv";
-import { log } from "../lib/utils";
+import { log } from "../../lib/utils/logger";
 
 config({ path: ".env.local" });
 
