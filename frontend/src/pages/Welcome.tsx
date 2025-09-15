@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Components/Layout/Navbar";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import Navbar from "../Components/Layout/Navbar.tsx";
+import CyberpunkLayout from "../Components/Layout/CyberpunkLayout.tsx";
 import NeonButton from "../Components/ui/NeonButton.tsx";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../lib/axios.ts";
 
 const Game: React.FC = () => {
   const [, setUser] = useState<null | {
