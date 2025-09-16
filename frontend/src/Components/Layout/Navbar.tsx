@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import defaultAvatar from "../../assets/default-avatar.png"; // ✅ Add this
+import Logo from "../ui/Logo";
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<null | { fullName: string; profilePicture: string }>(null);
@@ -34,11 +35,8 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="w-full flex items-center justify-between px-8 py-4 bg-gray-900/80 backdrop-blur-md shadow-md">
-      <Link to="/" className="text-2xl font-bold font-mono text-cyan-400 hover:text-cyan-300 transition">
-        VIETNAMESE CARD GAME
-      </Link>
-
-      <ul className="flex items-center gap-6 font-mono text-sm">
+      <Logo size="sm" align="left" />
+      <ul className="flex items-center gap-6 font-mono text-sm ml-auto">
         <li>
           <Link to="/" className="text-cyan-400 hover:text-cyan-300 transition">
             Home

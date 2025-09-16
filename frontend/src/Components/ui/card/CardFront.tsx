@@ -22,7 +22,7 @@ const CardFront: React.FC<CardFrontProps> = ({ card }) => {
   };
 
   const isRed = card.getSuit === Suit.Heart || card.getSuit === Suit.Diamond;
-  const suitClass = card.getSuit.toLowerCase(); // spade, heart, diamond, club
+  const suitClass = card.getSuit.toLowerCase(); 
   const rank = Card.rankToString(card.getRank);
   const suitSymbol = renderSuitSymbol();
 

@@ -6,7 +6,7 @@ import CyberpunkInput from "../Components/ui/CyberpunkInput";
 import Neonbutton from "../Components/ui/NeonButton.tsx";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
-import { axiosInstance } from "../lib/axios";
+import { UserAPI } from "../api/UserApi.ts";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -29,9 +29,9 @@ const SignUp: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const { name, value } = e.target; 
+    setFormData({ ...formData, [name]: value }); 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,37 +47,20 @@ const SignUp: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await axiosInstance.post(
-        "api/auth/signup",
-        {
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-        },
-      );
-
-      setMessage("Signup successful! Redirecting to login...");
-      setFormData({
-        fullName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
+      await UserAPI.signup({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
       });
 
-      setTimeout(() => {
-        navigate("/login");
-        setIsLoading(false);
-      }, 2000);
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setError(
-        err.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
+      setMessage("Signup successful! Redirecting to login...");
+      navigate("/login");
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Something went wrong.");
+    } finally {
       setIsLoading(false);
     }
   };
-
   type InputField = {
     id: keyof typeof formData;
     label: string;
