@@ -24,6 +24,7 @@ const Login: React.FC = () => {
       try {
         const res = await axiosInstance.get("/api/auth/check");
         setUser({ fullName: res.data.fullName });
+        navigate("/game");
       } catch (err) {
         setUser({});
       } finally {
