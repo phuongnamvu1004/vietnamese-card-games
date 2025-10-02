@@ -1,76 +1,80 @@
 import { Request, Response } from "express";
 import { log } from "../lib/utils/logger";
-import cloudinary from "../lib/cloudinary";
-import { updateUserProfilePic } from "../repositories/user.repository";
-import {
-  getUserStatisticsPhomByUserId,
-  getUserStatisticsSamByUserId,
-} from "../repositories/user-statistics.repository";
+import { UserService } from "../services/user.service";
+import { GetUserStatisticsResponseDTO, UpdateProfileResponseDTO } from "../dtos/user.dto";
 
-export const updateProfile = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { profilePic } = req.body;
-    const userId = req.user!.id; // ✅ Use numeric `id`
+export const UserController = {
+  async updateProfile(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const { profilePic } = req.body;
+      const userId = req.user!.id; // ✅ Use numeric `id`
 
-    if (!profilePic) {
-      log("Profile pic is required", "warn");
-      res.status(400).json({ message: "Profile pic is required" });
-      return;
+      const updatedUser = await UserService.updateProfile({ userId, profilePic }, res);
+      if (!updatedUser) {
+        return;
+      }
+
+      const updateProfileResponse: UpdateProfileResponseDTO = {
+        user: updatedUser,
+        message: "Profile updated successfully",
+      }
+      log("User profile updated successfully:", updatedUser, "info");
+      res.status(200).json(updateProfileResponse);
+    } catch (error) {
+      log("error in update profile:", (error as Error).message, "error");
+      res.status(500).json({ message: "Internal server error" });
     }
+  },
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-
-    const updatedUser = await updateUserProfilePic(
-      userId,
-      uploadResponse.secure_url,
-    );
-
-    if (!updatedUser) {
-      log("Failed to update user profile", "error");
-      res.status(500).json({ message: "Failed to update user profile" });
-      return;
+  async getUserData(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      log("User authenticated successfully:", req.user, "info");
+      res.status(200).json(req.user);
+    } catch (error) {
+      log("Error in getUserData controller:", (error as Error).message, "error");
+      res.status(500).json({ message: "Internal server error" });
     }
+  },
 
-    log("User profile updated successfully:", updatedUser, "info");
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    log("error in update profile:", (error as Error).message, "error");
-    res.status(500).json({ message: "Internal server error" });
+  async getUserStatistics(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+
+      const stats = await UserService.getUserStatistics({ userId }, res);
+      if (!stats) {
+        return;
+      }
+
+      const { samData, phomData } = stats;
+
+      const getUserStatisticsResponse: GetUserStatisticsResponseDTO = {
+        stats: {
+          samData,
+          phomData
+        },
+        message: "User statistics retrieved successfully",
+      }
+
+      res.status(200).json(getUserStatisticsResponse);
+    } catch (error) {
+      log(
+        "Error in getUserStatistics controller:",
+        (error as Error).message,
+        "error",
+      );
+    }
   }
 };
 
-export const getUserData = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    res.status(200).json(req.user);
-    log("User authenticated successfully:", req.user, "info");
-  } catch (error) {
-    log("Error in getUserData controller:", (error as Error).message, "error");
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
 
-export const getUserStatistics = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const userId = req.user!.id;
 
-    const samData = await getUserStatisticsSamByUserId(userId);
-    const phomData = await getUserStatisticsPhomByUserId(userId);
 
-    res.status(200).json({ samData: samData, phomData: phomData });
-  } catch (error) {
-    log(
-      "Error in getUserStatistics controller:",
-      (error as Error).message,
-      "error",
-    );
-  }
-};

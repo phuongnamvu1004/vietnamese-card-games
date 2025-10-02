@@ -17,7 +17,11 @@ redisClient.on("error", (err) => {
   log("Redis Client Error:", err, "error");
 });
 
-// ✅ Create and return the session store
+redisClient.on("connect", () => {
+  log("Redis Client connected successfully!", "info");
+});
+
+// Create and return the session store
 export const createNewSessionStore = () => {
   return new RedisStore({
     client: redisClient,
