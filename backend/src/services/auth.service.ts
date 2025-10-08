@@ -21,25 +21,20 @@ export const AuthService = {
     const { fullName, email, password } = input;
     if (!fullName || !email || !password) {
       log("All fields are required", "warn");
-      res.status(400).json({ message: "All fields are required" });
-      return;
+      throw new Error("All fields are required");
     }
 
     if (password.length < 6) {
       log("Password must be at least 6 characters", "warn");
-      res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
-      return;
+      throw new Error("Password must be at least 6 characters");
     }
 
     const user = await findUserByEmail(email);
-
     if (user) {
       log("Email already exists", "warn");
-      res.status(400).json({ message: "Email already exists" });
-      return;
+      throw new Error("Email already exists");
     }
+
     // Implementation of signup logic
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -52,12 +47,9 @@ export const AuthService = {
       hashedPassword,
     });
 
-    log("New user data:", newUser, "info");
-
     if (!newUser) {
       log("Invalid user data", "warn");
-      res.status(400).json({ message: "Invalid user data" });
-      return;
+      throw new Error("Invalid user data");
     }
 
     await initializeUserStatisticsSam(newUser.id);
@@ -84,15 +76,13 @@ export const AuthService = {
 
     if (!user) {
       log("Invalid credentials", "warn");
-      res.status(400).json({ message: "Invalid credentials" });
-      return;
+      throw new Error("Invalid credentials");
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       log("Invalid credentials", "warn");
-      res.status(400).json({ message: "Invalid credentials" });
-      return;
+      throw new Error("Invalid credentials");
     }
 
     generateToken(user.id.toString(), res);

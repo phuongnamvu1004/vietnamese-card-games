@@ -14,7 +14,7 @@ export const createUser = async (user: CreateUserRepoDTO): Promise<SafeUser | nu
         full_name: user.fullName,
         password: user.hashedPassword,
         profile_pic: "", // default by empty profile pic <-> change later when updating profile
-        balance: 0,
+        balance: 1000, // default initial balance
       },
     ])
     .select()
@@ -50,7 +50,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
     .eq("email", email)
     .maybeSingle();
 
-  if (error) {
+  if (error || !data) {
     log("findUserByEmail error:", error, "error");
     return null;
   }
