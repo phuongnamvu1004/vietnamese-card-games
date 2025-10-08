@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 
-import { log } from "../lib/utils/logger";
-
 import { InvitationService } from "../services/invitation.service";
 
-import { toError } from "../lib/utils/errors-handlers";
+import { invitationControllerErrorHandler } from "../lib/utils/errors-handlers";
 import { getIo } from "../socket";
 
 export const InvitationController = {
@@ -16,39 +14,7 @@ export const InvitationController = {
       const result = await InvitationService.acceptInvitation({ invitorId, inviteeId: userId, roomId }, getIo());
       res.status(200).json(result);
     } catch (error: unknown) {
-      const err = toError(error);
-
-      log(
-        "Error in acceptInvitation controller:",
-        err.message || "Internal server error",
-        "error"
-      );
-
-      if (err.message === "NOT_FOUND") {
-        res.status(404).json({ message: "Invitation not found" });
-        return;
-      }
-      if (err.message?.startsWith("ALREADY_")) {
-        res.status(400).json({
-          message: `Invitation is already ${err.message.split("_")[1].toLowerCase()}`
-        });
-        return;
-      }
-      if (err.message === "EXPIRED") {
-        res.status(400).json({ message: "Invitation has expired" });
-        return;
-      }
-      if (err.message === "ROOM_NOT_FOUND") {
-        res.status(500).json({ message: "Could not find room" });
-        return;
-      }
-      if (err.message === "UPDATE_FAILED") {
-        res.status(500).json({ message: "Could not update invitation status" });
-        return;
-      }
-
-      // fallback
-      res.status(500).json({ message: "Internal server error" });
+      invitationControllerErrorHandler(error, "accept", res);
     }
   },
 
@@ -64,41 +30,10 @@ export const InvitationController = {
       }, getIo());
       res.status(200).json(updatedInvitation);
     } catch (error: unknown) {
-      const err = toError(error);
-
-      log(
-        "Error in declineInvitation controller:",
-        err.message || "Internal server error",
-        "error"
-      );
-
-      if (err.message === "NOT_FOUND") {
-        res.status(404).json({ message: "Invitation not found" });
-        return;
-      }
-      if (err.message?.startsWith("ALREADY_")) {
-        res.status(400).json({
-          message: `Invitation is already ${err.message.split("_")[1].toLowerCase()}`
-        });
-        return;
-      }
-      if (err.message === "EXPIRED") {
-        res.status(400).json({ message: "Invitation has expired" });
-        return;
-      }
-      if (err.message === "ROOM_NOT_FOUND") {
-        res.status(500).json({ message: "Could not find room" });
-        return;
-      }
-      if (err.message === "UPDATE_FAILED") {
-        res.status(500).json({ message: "Could not update invitation status" });
-        return;
-      }
-
-      // fallback
-      res.status(500).json({ message: "Internal server error" });
+      invitationControllerErrorHandler(error, "decline", res);
     }
-  },
+  }
+  ,
 
   async cancelInvitation(req: Request, res: Response) {
     try {
@@ -108,35 +43,7 @@ export const InvitationController = {
       const updatedInvitation = await InvitationService.cancelInvitation({ invitorId, inviteeId, roomId }, getIo());
       res.status(200).json(updatedInvitation);
     } catch (error: unknown) {
-      const err = toError(error);
-
-      log(
-        "Error in cancelInvitation controller:",
-        err.message || "Internal server error",
-        "error"
-      );
-
-      if (err.message === "NOT_FOUND") {
-        res.status(404).json({ message: "Invitation not found" });
-        return;
-      }
-      if (err.message?.startsWith("ALREADY_")) {
-        res.status(400).json({
-          message: `Invitation is already ${err.message.split("_")[1].toLowerCase()}`
-        });
-        return;
-      }
-      if (err.message === "ROOM_NOT_FOUND") {
-        res.status(500).json({ message: "Could not find room" });
-        return;
-      }
-      if (err.message === "UPDATE_FAILED") {
-        res.status(500).json({ message: "Could not update invitation status" });
-        return;
-      }
-
-      // fallback
-      res.status(500).json({ message: "Internal server error" });
+      invitationControllerErrorHandler(error, "cancel", res);
     }
   }
 }
