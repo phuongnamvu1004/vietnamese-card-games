@@ -3,8 +3,9 @@ import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
 import Neonbutton from "../Components/ui/NeonButton.tsx";
 import PokerChip from "../Components/ui/PokerChip";
-import CardFan from "../Components/ui/CardFan"; // 🆕 thêm
-import Dice3D from "../Components/ui/Dice";   // 🆕 thêm
+import CardFan from "../Components/ui/card/CardFan.tsx";
+import Dice3D from "../Components/ui/Dice";
+import Coin from "../Components/ui/Coin";
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -81,33 +82,26 @@ const Home: React.FC = () => {
 
         {/* RIGHT SECTION */}
         <div className="w-1/2 flex items-center justify-center relative pr-20">
-          {/* Neon border frame */}
-          <div
-            className="absolute inset-y-1/4 inset-x-1/4 border-2 border-cyan-500/50 p-4 rounded-xl neon-flicker"
-            style={{
-              boxShadow: "0 0 30px rgba(6,182,212,0.4)",
-              transform: "rotate(-5deg)",
-            }}
-          >
-            <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400"></div>
-            <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400"></div>
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-400"></div>
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400"></div>
+          <div className="absolute inset-0 flex justify-center items-center translate-y-[-40px]">
+            {/* Neon aura glow behind cards */}
+            <div className="absolute w-[420px] h-[270px] bg-cyan-400/20 blur-3xl rounded-full animate-pulse"></div>
+            <Coin style={{ top: "5%", left: "20%", position: "absolute" }} size={80} />
+            <Coin style={{ top: "20%", right: "10%", position: "absolute" }} size={90} />
+            <Coin style={{ bottom: "10%", left: "15%", position: "absolute" }} size={70} />
+            <Coin style={{ bottom: "20%", right: "20%", position: "absolute" }} size={100} />
+            <Coin style={{ top: "50%", left: "0%", position: "absolute" }} size={60} />
+            {/* Card Fan */}
+            <div className="relative z-10 transform scale-125 rotate-2 hover:scale-130 transition-transform duration-500 animate-float">
+              <CardFan />
+            </div>
           </div>
 
-          {/* Card Fan (bộ bài xoè) */}
-          <div className="relative z-10 transform scale-110 rotate-3 hover:scale-115 transition-transform duration-500 animate-float">
-            <CardFan />
-          </div>
-
-          {/* Dice (đặt bên cạnh) */}
-          <div className="absolute bottom-10 right-0 drop-shadow-[0_0_15px_rgba(6,182,212,0.7)]">
+          <div className="absolute bottom-12 right-12 drop-shadow-[0_0_15px_rgba(6,182,212,0.7)]">
             <Dice3D />
           </div>
         </div>
       </div>
 
-      {/* Effects */}
       <style>{`
         @keyframes glitch {
           0% {

@@ -12,7 +12,6 @@ const Dice3D: React.FC = () => {
           animation: "spin-slow 10s linear infinite",
         }}
       >
-        {/* Các mặt xúc xắc */}
         <div className="side front"><div className="dot center"></div></div>
         <div className="side top">
           <div className="dot dtop dleft"></div>
