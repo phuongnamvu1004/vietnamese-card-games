@@ -3,36 +3,16 @@ import { generateRoomId } from "../lib/utils/generators";
 import { log } from "../lib/utils/logger";
 import { toError } from "../lib/utils/errors-handlers";
 import { CreateRoomRequestDTO } from "../dtos/room.dto";
-import { RoomService } from "../services/room.service";
 import { getIo } from "../socket";
+import { IRoomService } from "../interfaces/services/room-service";
+import { IRoomController } from "../interfaces/controllers/room-controller";
 
-export const RoomController = {
-  /**
-   * Creates a new game room.
-   *
-   * Responsibilities:
-   * - Validates input and generates a unique room ID
-   * - Resolves player emails to user IDs
-   * - Initializes an empty gameState in Redis
-   * - Saves room metadata in PostgreSQL
-   * - Creates room-user associations for host and invited players
-   *
-   * Assumes gameplay will begin later; players will join and update gameState via socket.
-   *
-   * @route POST /api/room
-   * @access Authenticated users only
-   *
-   * @param req - Express request with game setup info:
-   *    {
-   *      gameType: "sam" | "phom",
-   *      maxPlayers: number,
-   *      buyIn: number,
-   *      betUnit: number,
-   *      players: string[] // player emails
-   *    }
-   * @param res - Express response object
-   */
-  async createNewRoom (req: Request, res: Response) {
+export class RoomController implements IRoomController {
+  constructor(
+    private readonly _roomService: IRoomService,
+  ) {}
+
+  public createNewRoom = async (req: Request, res: Response): Promise<void> => {
     try {
       const { gameType, maxPlayers, buyIn, betUnit, players }: CreateRoomRequestDTO = req.body;
 
@@ -40,7 +20,7 @@ export const RoomController = {
       const hostUserId = req.user!.id;
 
       // TODO: When host creates room, they should join the room automatically, call socket "join-room"
-      const { room, inviteeIds } = await RoomService.createRoomWithInvitations({
+      const { room, inviteeIds } = await this._roomService.createRoomWithInvitations({
         roomId,
         hostUserId,
         gameType,

@@ -1,23 +1,19 @@
 import { Response } from "express";
 import bcrypt from "bcryptjs";
-import { createUser, findUserByEmail } from "../repositories/user.repository";
 import { log } from "../lib/utils/logger";
-import { initializeUserStatisticsPhom, initializeUserStatisticsSam } from "../repositories/user-statistics.repository";
 import { generateToken } from "../lib/utils/generators";
+import { CreateUserResponseDTO, LoginUserResponseDTO } from "../dtos/user.dto";
+import { IAuthService, SignUpAuthServiceInput, LoginAuthServiceInput } from "../interfaces/services/auth-service";
+import { IUserRepository } from "../interfaces/repositories/user-repository";
+import { IUserStatisticsRepository } from "../interfaces/repositories/user-statistics-repository";
 
-export type SignUpAuthServiceInput = {
-  fullName: string;
-  email: string;
-  password: string;
-}
+export class AuthService implements IAuthService {
+  constructor(
+    private readonly _userRepo: IUserRepository,
+    private readonly _userStatsRepo: IUserStatisticsRepository,
+  ) {}
 
-export type LoginAuthServiceInput = {
-  email: string;
-  password: string;
-}
-
-export const AuthService = {
-  async signup(input: SignUpAuthServiceInput, res: Response) {
+  async signup(input: SignUpAuthServiceInput, res: Response): Promise<CreateUserResponseDTO> {
     const { fullName, email, password } = input;
     if (!fullName || !email || !password) {
       log("All fields are required", "warn");
@@ -29,7 +25,7 @@ export const AuthService = {
       throw new Error("Password must be at least 6 characters");
     }
 
-    const user = await findUserByEmail(email);
+    const user = await this._userRepo.findUserByEmail(email);
     if (user) {
       log("Email already exists", "warn");
       throw new Error("Email already exists");
@@ -41,7 +37,7 @@ export const AuthService = {
 
     log("Hashed password:", hashedPassword, "info");
 
-    const newUser = await createUser({
+    const newUser = await this._userRepo.createUser({
       fullName,
       email,
       hashedPassword,
@@ -52,8 +48,8 @@ export const AuthService = {
       throw new Error("Invalid user data");
     }
 
-    await initializeUserStatisticsSam(newUser.id);
-    await initializeUserStatisticsPhom(newUser.id);
+    await this._userStatsRepo.initializeUserStatisticsSam(newUser.id);
+    await this._userStatsRepo.initializeUserStatisticsPhom(newUser.id);
 
     // generate jwt token
     generateToken(newUser.id.toString(), res);
@@ -64,15 +60,15 @@ export const AuthService = {
       id: newUser.id,
       fullName: newUser.fullName,
       email: newUser.email,
-      profilePic: newUser.profilePic,
+      profilePic: newUser.profilePic ?? "",
       balance: newUser.balance,
     };
-  },
+  }
 
-  async login(input: LoginAuthServiceInput, res: Response) {
+  async login(input: LoginAuthServiceInput, res: Response): Promise<LoginUserResponseDTO> {
     const { email, password } = input;
 
-    const user = await findUserByEmail(email);
+    const user = await this._userRepo.findUserByEmail(email);
 
     if (!user) {
       log("Invalid credentials", "warn");
@@ -93,10 +89,10 @@ export const AuthService = {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      profilePic: user.profilePic,
+      profilePic: user.profilePic ?? "",
       balance: user.balance,
     }
-  },
+  }
 
   logout(res: Response) {
     res.cookie("jwt", "", { maxAge: 0 });

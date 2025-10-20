@@ -1,22 +1,19 @@
 import { Response } from "express";
 import { log } from "../lib/utils/logger";
 import cloudinary from "../lib/cloudinary";
-import { updateUserProfilePic } from "../repositories/user.repository";
-import {
-  getUserStatisticsPhomByUserId,
-  getUserStatisticsSamByUserId
-} from "../repositories/user-statistics.repository";
+import { IUserService, UpdateProfileServiceInput, GetUserStatisticsServiceInput, GetUserStatisticsServiceOutput } from "../interfaces/services/user-service";
+import { IUserRepository } from "../interfaces/repositories/user-repository";
+import { IUserStatisticsRepository } from "../interfaces/repositories/user-statistics-repository";
+import { SafeUser } from "../mappers/user.mapper";
 
-export type UpdateProfileServiceInput = {
-  userId: number;
-  profilePic: string;
-}
 
-export type GetUserStatisticsServiceInput = {
-  userId: number;
-}
-export const UserService = {
-  async updateProfile(input: UpdateProfileServiceInput, res: Response) {
+export class UserService implements IUserService {
+  constructor(
+    private readonly _userRepo: IUserRepository,
+    private readonly _userStatsRepo: IUserStatisticsRepository,
+  ) {}
+
+  async updateProfile(input: UpdateProfileServiceInput, res: Response): Promise<SafeUser | undefined> {
     const { userId, profilePic } = input;
 
     if (!profilePic) {
@@ -27,7 +24,7 @@ export const UserService = {
 
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
 
-    const updatedUser = await updateUserProfilePic(
+    const updatedUser = await this._userRepo.updateUserProfilePic(
       userId,
       uploadResponse.secure_url,
     );
@@ -41,17 +38,17 @@ export const UserService = {
     log("User profile updated successfully:", updatedUser, "info");
 
     return updatedUser;
-  },
+  };
 
-  async getUserStatistics(input: GetUserStatisticsServiceInput, res: Response) {
+  async getUserStatistics(input: GetUserStatisticsServiceInput, res: Response): Promise<GetUserStatisticsServiceOutput | undefined> {
     const { userId } = input;
-    const samData = await getUserStatisticsSamByUserId(userId);
-    const phomData = await getUserStatisticsPhomByUserId(userId);
+    const samData = await this._userStatsRepo.getUserStatisticsSamByUserId(userId);
+    const phomData = await this._userStatsRepo.getUserStatisticsPhomByUserId(userId);
 
     if (!samData || !phomData) {
       log("Failed to retrieve user statistics", "error");
       res.status(500).json({ message: "Failed to retrieve user statistics" });
-      return null;
+      return;
     }
 
     return { samData, phomData };
