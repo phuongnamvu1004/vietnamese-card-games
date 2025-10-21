@@ -1,29 +1,32 @@
 import { Request, Response } from "express";
-
-import { InvitationService } from "../services/invitation.service";
-
 import { invitationControllerErrorHandler } from "../lib/utils/errors-handlers";
 import { getIo } from "../socket";
+import { IInvitationService } from "../interfaces/services/invitation-service";
+import { IInvitationController } from "../interfaces/controllers/invitation-controller";
 
-export const InvitationController = {
-  async acceptInvitation(req: Request, res: Response) {
+export class InvitationController implements IInvitationController {
+  constructor(
+    private readonly _invitationService: IInvitationService,
+  ) {}
+
+  public acceptInvitation = async (req: Request, res: Response) => {
     try {
       const userId = req.user!.id;
       const { invitorId, roomId } = req.body;
 
-      const result = await InvitationService.acceptInvitation({ invitorId, inviteeId: userId, roomId }, getIo());
+      const result = await this._invitationService.acceptInvitation({ invitorId, inviteeId: userId, roomId }, getIo());
       res.status(200).json(result);
     } catch (error: unknown) {
       invitationControllerErrorHandler(error, "accept", res);
     }
-  },
+  };
 
-  async declineInvitation(req: Request, res: Response) {
+  public declineInvitation = async (req: Request, res: Response) => {
     try {
       const userId = req.user!.id;
       const { invitorId, roomId } = req.body;
 
-      const updatedInvitation = await InvitationService.declineInvitation({
+      const updatedInvitation = await this._invitationService.declineInvitation({
         invitorId,
         inviteeId: userId,
         roomId
@@ -32,18 +35,17 @@ export const InvitationController = {
     } catch (error: unknown) {
       invitationControllerErrorHandler(error, "decline", res);
     }
-  }
-  ,
+  };
 
-  async cancelInvitation(req: Request, res: Response) {
+  public cancelInvitation = async (req: Request, res: Response) => {
     try {
       const invitorId = req.user!.id;
       const { inviteeId, roomId } = req.body;
 
-      const updatedInvitation = await InvitationService.cancelInvitation({ invitorId, inviteeId, roomId }, getIo());
+      const updatedInvitation = await this._invitationService.cancelInvitation({ invitorId, inviteeId, roomId }, getIo());
       res.status(200).json(updatedInvitation);
     } catch (error: unknown) {
       invitationControllerErrorHandler(error, "cancel", res);
     }
-  }
+  };
 }

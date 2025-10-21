@@ -3,13 +3,18 @@ import { log } from "../lib/utils/logger";
 import { CreateUserRequestDTO, CreateUserResponseDTO, LoginUserResponseDTO } from "../dtos/user.dto";
 import { AuthService } from "../services/auth.service";
 import { toError } from "../lib/utils/errors-handlers";
+import { IAuthController } from "../interfaces/controllers/auth-controller";
 
-export const AuthController = {
-  async signup(req: Request, res: Response): Promise<void> {
+export class AuthController implements IAuthController{
+  constructor(
+    private readonly _authService: AuthService,
+  ) {}
+
+  public signup = async (req: Request, res: Response): Promise<void> => {
     const { fullName, email, password }: CreateUserRequestDTO = req.body;
 
     try {
-      const newUser = await AuthService.signup({ fullName, email, password }, res);
+      const newUser = await this._authService.signup({ fullName, email, password }, res);
 
       const signupResponse: CreateUserResponseDTO = {
         id: newUser.id,
@@ -35,13 +40,13 @@ export const AuthController = {
 
       res.status(500).json({ message: "Internal Server Error" });
     }
-  },
+  };
 
-  async login(req: Request, res: Response): Promise<void> {
+  public login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     try {
-      const user = await AuthService.login({ email, password }, res);
+      const user = await this._authService.login({ email, password }, res);
 
       const loginResponse: LoginUserResponseDTO = {
         id: user.id,
@@ -64,11 +69,11 @@ export const AuthController = {
 
       res.status(500).json({ message: "Internal Server Error" });
     }
-  },
+  }
 
-  logout(_req: Request, res: Response): void {
+  public logout = (_req: Request, res: Response): void => {
     try {
-      AuthService.logout(res);
+      this._authService.logout(res);
       res.status(200).json({ message: "Logged out successfully" });
     } catch (error: unknown) {
       const err = toError(error)
@@ -79,9 +84,9 @@ export const AuthController = {
       );
       res.status(500).json({ message: "Internal Server Error" });
     }
-  },
+  };
 
-  checkAuth(req: Request, res: Response): void {
+  public checkAuth = (req: Request, res: Response): void => {
     try {
       res.status(200).json(req.user);
       log("User authenticated successfully:", req.user, "info");

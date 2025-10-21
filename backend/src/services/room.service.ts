@@ -1,27 +1,20 @@
-import { createRoom, createRoomPlayer } from "../repositories/room.repository";
-import { createInvitations } from "../repositories/invitation.repository";
-import { findUserByEmail } from "../repositories/user.repository";
 import { createGameState } from "../databases/redis/game-state";
 import { log } from "../lib/utils/logger";
 import { CurrentGameState } from "../types/game";
 import { Server } from "socket.io";
+import { IRoomRepository } from "../interfaces/repositories/room-repository";
+import { CreateRoomServiceInput, CreateRoomServiceOutput, IRoomService } from "../interfaces/services/room-service";
+import { IUserRepository } from "../interfaces/repositories/user-repository";
+import { IInvitationRepository } from "../interfaces/repositories/invitation-repository";
 
-export type CreateRoomServiceInput = {
-  roomId: string;
-  hostUserId: number;
-  gameType: "sam" | "phom";
-  maxPlayers: number;
-  buyIn: number;
-  betUnit: number;
-  inviteeEmails: string[]; // controller passes emails; service resolves to ids
-};
+export class RoomService implements IRoomService {
+  constructor(
+    private readonly _userRepo: IUserRepository,
+    private readonly _roomRepo: IRoomRepository,
+    private readonly _invitationRepo: IInvitationRepository
+  ) {}
 
-export const RoomService = {
-  /**
-   * Create a room aggregate (Redis + DB + room_players) and return the room plus invitee IDs.
-   * NOTE: Wrap in a DB transaction if you introduce more writes that must be atomic.
-   */
-  async createRoomWithInvitations(input: CreateRoomServiceInput, io: Server) {
+  async createRoomWithInvitations(input: CreateRoomServiceInput, io: Server): Promise<CreateRoomServiceOutput> {
     const {
       roomId,
       hostUserId,
@@ -36,7 +29,7 @@ export const RoomService = {
     const resolvePlayerIds = async (emails: string[]): Promise<number[]> => {
       const ids = await Promise.all(
         emails.map(async (playerEmail) => {
-          const user = await findUserByEmail(playerEmail);
+          const user = await this._userRepo.findUserByEmail(playerEmail);
           if (!user) throw new Error(`User not found for email: ${playerEmail}`);
           return user.id;
         })
@@ -70,7 +63,7 @@ export const RoomService = {
     log("Game state created in Redis:", roomId, "info");
 
     // Persist room
-    const room = await createRoom({
+    const room = await this._roomRepo.createRoom({
       roomId,
       hostUserId,
       gameType,
@@ -82,7 +75,7 @@ export const RoomService = {
     log("Room created successfully:", roomId, "info");
 
     // room_players: host
-    await createRoomPlayer({
+    await this._roomRepo.createRoomPlayer({
       roomId: room.id,
       userId: hostUserId,
       status: "host",
@@ -90,7 +83,7 @@ export const RoomService = {
     });
 
     // Create invitations to invitees
-    const invitations = await createInvitations({
+    const invitations = await this._invitationRepo.createInvitations({
       invitorId: hostUserId,
       roomId: room.id,
       inviteeIds
@@ -124,7 +117,7 @@ export const RoomService = {
 
     // 5) room_players: invited
     for (const uid of inviteeIds) {
-      await createRoomPlayer({
+      await this._roomRepo.createRoomPlayer({
         roomId: room.id,
         userId: uid,
         status: "invited",
@@ -133,5 +126,5 @@ export const RoomService = {
     }
 
     return { room, inviteeIds };
-  },
-};
+  };
+}

@@ -1,19 +1,21 @@
 import express from "express";
 import { protectRoute } from "../middlewares/auth.middleware";
 import { RoomController } from "../controllers/room.controller";
+import { UserRepository } from "../repositories/user.repository";
+import { supabase } from "../databases/supabase";
+import { RoomRepository } from "../repositories/room.repository";
+import { InvitationRepository } from "../repositories/invitation.repository";
+import { RoomService } from "../services/room.service";
 
 const router = express.Router();
 
-// Create a new room
-router.post("/create-room", protectRoute, RoomController.createNewRoom);
+const userRepo = new UserRepository(supabase);
+const roomRepo = new RoomRepository(supabase);
+const invitationRepo = new InvitationRepository(supabase);
+const roomService = new RoomService(userRepo, roomRepo, invitationRepo);
+const roomController = new RoomController(roomService);
 
-// Invitations routes
-// router.post("/rooms/:roomId/invitations/cancel", protectRoute, cancelInvitations);
-//
-// // List players in a room
-// router.get("/rooms/:roomId/players", protectRoute, listRoomPlayers);
-//
-// // List my invitations
-// router.get("/me/invitations", protectRoute, listMyInvitations);
+// Create a new room
+router.post("/create-room", protectRoute, roomController.createNewRoom);
 
 export default router;
