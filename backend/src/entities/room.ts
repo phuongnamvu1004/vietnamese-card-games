@@ -4,10 +4,8 @@ export interface Room {
   hostUserId: number;
   gameType: "sam" | "phom";
   maxPlayers: number;
-  players: number[]; // user ID
   buyIn: number;
   betUnit: number;
-  isOnline: boolean;
   createdAt: string;
   updatedAt: string;
 }

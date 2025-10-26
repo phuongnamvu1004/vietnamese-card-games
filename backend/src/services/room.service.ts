@@ -26,6 +26,12 @@ export class RoomService implements IRoomService {
     } = input;
 
     /** Resolve emails → user IDs. Throws if any email is not found. */
+    const resolveHostName = async (id: number): Promise<string> => {
+      const user = await this._userRepo.findUserById(id);
+      if (!user) throw new Error(`User not found for id: ${id}`);
+      return user.fullName;
+    }
+
     const resolvePlayerIds = async (emails: string[]): Promise<number[]> => {
       const ids = await Promise.all(
         emails.map(async (playerEmail) => {
@@ -53,6 +59,10 @@ export class RoomService implements IRoomService {
       }
       return { ...base, gameType: "phom", phomSpecificField: undefined } as CurrentGameState;
     }
+
+    /** Helper to emit event to personal rooms */
+    const userRoom = (userId: number) => `user:${userId}`;
+
 
     // Resolve invitees
     const inviteeIds = await resolvePlayerIds(inviteeEmails);
@@ -88,23 +98,29 @@ export class RoomService implements IRoomService {
       roomId: room.id,
       inviteeIds
     });
-    if (invitations && invitations.length !== inviteeIds.length) throw new Error("Failed to create all invitations");
+    if (!invitations) throw new Error("Failed to create invitations");
+
+    if (invitations.length !== inviteeIds.length) throw new Error("Failed to create all invitations");
     log("Invitations created successfully:", invitations, "info");
 
-    const userRoom = (userId: number) => `user:${userId}`;
+
     // Emit socket events to invitees and host
     const payloadBase = {
-      roomId: room.id,
-      invitorId: hostUserId,
-      gameType,
-      maxPlayers,
-      buyIn,
-      betUnit,
+      room
     };
 
-    // Notify each invitee in their personal room channel
-    for (const inviteeId of inviteeIds) {
-      const payload = { ...payloadBase, inviteeId };
+    const hostName = await resolveHostName(hostUserId);
+
+    // Notify each invitee in their personal room channel the inviteToken
+    for (const invitation of invitations) {
+      const { inviteeId, inviteToken } = invitation;
+      const payload = {
+        ...payloadBase,
+        inviteToken,
+        invitorId: hostUserId,
+        inviteeId,
+        message: `You have been invited to join the room ${roomId} by ${hostName}!`
+      };
       io.to(userRoom(inviteeId)).emit("invitation:created", payload);
     }
 
