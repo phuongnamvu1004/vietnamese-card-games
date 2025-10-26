@@ -15,6 +15,7 @@ export type CreateRoomServiceOutput = {
   room: Room;
   inviteeIds: number[];
 };
+
 export interface IRoomService {
   createRoomWithInvitations(input: CreateRoomServiceInput, io: Server): Promise<CreateRoomServiceOutput>;
 }

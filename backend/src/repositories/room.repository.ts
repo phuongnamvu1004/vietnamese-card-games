@@ -73,10 +73,8 @@ export class RoomRepository implements IRoomRepository {
         host_user_id: room.hostUserId,
         game_type: room.gameType,
         max_players: room.maxPlayers,
-        players: room.players,
         buy_in: room.buyIn,
         bet_unit: room.betUnit,
-        is_online: room.isOnline,
       })
       .eq("id", room.id)
       .select()
@@ -147,14 +145,16 @@ export class RoomRepository implements IRoomRepository {
   async updateRoomPlayerStatus(
     roomId: number,
     userId: number,
-    status: "joined" | "left" | "kicked",
+    status: "accepted" | "declined" | "canceled" | "joined" | "left" | "kicked",
   ): Promise<RoomPlayer | null> {
+    // Prepare update data (strictly typed)
+    const updateData: { status: typeof status; joined_at?: Date } = { status };
+    if (status === "joined") {
+      updateData.joined_at = new Date();
+    }
     const { data, error } = await this._db
       .from("room_players")
-      .update({
-        status: status,
-        joined_at: new Date()
-      })
+      .update(updateData)
       .eq("room_id", roomId)
       .eq("user_id", userId)
       .select("*")

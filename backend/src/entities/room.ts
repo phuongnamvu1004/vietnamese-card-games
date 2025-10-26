@@ -13,7 +13,7 @@ export interface Room {
 export interface RoomPlayer {
   roomId: number;
   userId: number;
-  status: "host" | "invited" | "accepted" | "declined" | "joined" | "left" | "kicked";
+  status: "host" | "invited" | "accepted" | "declined" | "canceled" | "joined" | "left" | "kicked";
   invitedBy: number; // invitor user ID
   invitedAt: Date | null;
   joinedAt: Date | null;

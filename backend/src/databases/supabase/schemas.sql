@@ -36,7 +36,7 @@ CREATE TABLE game_logs
 );
 
 -- room_players and room_invitations tables
-CREATE TYPE room_player_status AS ENUM ('host','invited','accepted','declined', 'joined', 'left','kicked');
+CREATE TYPE room_player_status AS ENUM ('host', 'invited', 'accepted', 'declined', 'canceled', 'joined', 'left', 'kicked');
 CREATE TABLE room_players
 (
     room_id    INTEGER            NOT NULL REFERENCES rooms (id) ON DELETE CASCADE,
