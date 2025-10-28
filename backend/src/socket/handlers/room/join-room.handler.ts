@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { findRoomByRoomId, getJoinedPlayersFromRoom, updateRoomPlayerStatus} from "../../../repositories/room.repository";
+import { getJoinedPlayersFromRoom, updateRoomPlayerStatus} from "../../../repositories/room.repository";
 import { log } from "../../../lib/utils/logger";
 import { toError } from "../../../lib/utils/errors-handlers";
 import { getGameState, updateGameState } from "../../../databases/redis/game-state";

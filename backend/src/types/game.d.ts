@@ -1,4 +1,5 @@
 import { Card } from "../game/shared/cards";
+import { InstantWinType } from "../game/sam/rules/check-instant-win";
 
 type Player = {
   id: number,
@@ -7,6 +8,8 @@ type Player = {
   hand: Card[];
   buyIn: number;
   gameBalance: number;
+  numWins: number;
+  numLosses: number;
   mustBeat: boolean;
   state: "instantWin" | "waitingForTurn" | "inTurn";
 };
@@ -20,9 +23,10 @@ type BaseGameState = {
   phase: "waiting" | "playing" | "finish";
 };
 
+// Sam's specific
 type SamGameState = BaseGameState & {
   gameType: "sam";
-  instantWinPlayers: Player[]; // Replace it with real fields for sam
+  instantWinPlayers: Record<number, Record<InstantWinType, number>>; // map in the format: {player_id: {win_type: win_count}}
 };
 
 type PhomGameState = BaseGameState & {
