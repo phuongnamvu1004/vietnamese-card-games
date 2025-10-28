@@ -96,6 +96,22 @@ export class AuthController implements IAuthController{
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
+
+  public refresh = (req: Request, res: Response): void => {
+    try {
+      const token = req.cookies?.jwt;
+      if (!token) {
+        res.status(401).json({ message: "No token cookie" });
+        return;
+      }
+      res.status(200).json({ accessToken: token });
+      log("Access token refreshed successfully", "info");
+    } catch (error: unknown) {
+      const err = toError(error);
+      log(`Error in refresh controller:`, err.message || "Internal server error", "error");
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 }
 
 
