@@ -54,7 +54,6 @@ export class AuthController implements IAuthController{
         email: user.email,
         profilePic: user.profilePic ?? "",
         balance: user.balance,
-        jwt: user.jwt,
       }
 
       res.status(200).json(loginResponse);
