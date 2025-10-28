@@ -54,7 +54,6 @@ export class AuthController implements IAuthController{
         email: user.email,
         profilePic: user.profilePic ?? "",
         balance: user.balance,
-        jwt: user.jwt,
       }
 
       res.status(200).json(loginResponse);
@@ -94,6 +93,22 @@ export class AuthController implements IAuthController{
     } catch (error: unknown) {
       const err = toError(error);
       log(`Error in checkAuth controller:`, err.message || "Internal server error", "error");
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  public refresh = (req: Request, res: Response): void => {
+    try {
+      const token = req.cookies?.jwt;
+      if (!token) {
+        res.status(401).json({ message: "No token cookie" });
+        return;
+      }
+      res.status(200).json({ accessToken: token });
+      log("Access token refreshed successfully", "info");
+    } catch (error: unknown) {
+      const err = toError(error);
+      log(`Error in refresh controller:`, err.message || "Internal server error", "error");
       res.status(500).json({ message: "Internal Server Error" });
     }
   }

@@ -27,7 +27,6 @@ export type LoginUserResponseDTO = {
   email: string;
   profilePic: string;
   balance: number;
-  jwt: string;
 }
 
 export type UpdateProfileResponseDTO = {

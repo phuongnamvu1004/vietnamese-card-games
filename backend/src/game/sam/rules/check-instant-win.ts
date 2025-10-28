@@ -1,12 +1,12 @@
 import { Card, Suit } from "../../shared/cards";
 
 export enum InstantWinType {
-  DragonStraight = "dragonStraight",
-  FourTwos = "fourTwo",
-  FlushHand = "flushHand",
-  ThreeTriplets = "threeTriplets",
-  FivePairs = "fivePairs",
-  None = "none",
+  DragonStraight = 1,
+  FourTwos = 2,
+  FlushHand = 3,
+  ThreeTriplets = 4,
+  FivePairs = 5,
+  None = 0,
 }
 
 // Check for instant wins in the correct order: Dragon Straight > Four Twos > Flush Hand > Three Triplets >  Five Pairs
