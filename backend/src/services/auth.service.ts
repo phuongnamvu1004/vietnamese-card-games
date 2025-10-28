@@ -81,7 +81,7 @@ export class AuthService implements IAuthService {
       throw new Error("Invalid credentials");
     }
 
-    generateToken(user.id.toString(), res);
+    const token = generateToken(user.id.toString(), res);
 
     log("User logged in successfully:", user, "info");
 
@@ -91,6 +91,7 @@ export class AuthService implements IAuthService {
       email: user.email,
       profilePic: user.profilePic ?? "",
       balance: user.balance,
+      jwt: token,
     }
   }
 
