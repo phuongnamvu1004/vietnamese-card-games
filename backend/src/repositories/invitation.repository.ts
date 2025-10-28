@@ -4,6 +4,7 @@ import { mapInvitationData } from "../mappers/invitation.mapper";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { IInvitationRepository } from "../interfaces/repositories/invitation-repository";
 import { Invitation } from "../entities/invitation";
+import crypto from "crypto";
 
 export class InvitationRepository implements IInvitationRepository {
   constructor(
@@ -15,6 +16,8 @@ export class InvitationRepository implements IInvitationRepository {
   ): Promise<Invitation[] | null>  {
     const invitationCreated = []
     for (const inviteeId of inviteeIds) {
+      const inviteToken = crypto.randomBytes(16).toString("hex");
+
       const { data, error } = await this._db
         .from("invitations")
         .insert([
@@ -23,6 +26,7 @@ export class InvitationRepository implements IInvitationRepository {
             invitee_id: inviteeId,
             room_id: roomId,
             status: "pending",
+            invite_token: inviteToken,
             created_at: new Date(),
             expired_at: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
             updated_at: new Date(),

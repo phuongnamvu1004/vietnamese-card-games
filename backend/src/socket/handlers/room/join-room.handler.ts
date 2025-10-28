@@ -5,6 +5,7 @@ import { toError } from "../../../lib/utils/errors-handlers";
 import { getGameState, updateGameState } from "../../../databases/redis/game-state";
 import { getUserById } from "../../../repositories/user.repository";
 import { CurrentGameState } from "../../../types/game";
+import { Room } from "../../../entities/room";
 
 // TODO: Rework the parameters for joinRoom to be more secure:
 /*
@@ -15,20 +16,14 @@ You already fetch the user and room on the server and check balances. You should
 	•	Compute/validate gameBalance server-side (or drop it from player state if you don’t truly need it in Redis)
  */
 type JoinRoomRequest = {
-  roomId: string;
+  room: Room;
   userId: number;
-  playerName: string;
-  buyIn: number;
-  gameBalance: number;
 }
 export const handleJoinRoom = (io: Server, socket: Socket) => {
   return async (
     {
-      roomId,
+      room,
       userId,
-      playerName,
-      buyIn,
-      gameBalance
     }: JoinRoomRequest,
     callback: (response: {
       success?: boolean;
@@ -38,12 +33,6 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
     }) => void
   ) => {
     try {
-      const room = await findRoomByRoomId(roomId);
-      if (!room) {
-        log("Room not found", "warn");
-        callback({ error: "Room not found" });
-        return;
-      }
 
       const currentPlayers: number[] | null = await getJoinedPlayersFromRoom(room.id);
       if (!currentPlayers) {
@@ -76,28 +65,29 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
         return;
       }
 
-      socket.join(roomId);
+      socket.join(room.roomId);
       // Saving roomId into socket data
-      socket.data.roomId = roomId;
+      socket.data.roomId = room.roomId;
 
-      const gameState = await getGameState(roomId);
+      const gameState = await getGameState(room.roomId);
       if (!gameState) {
         callback({ error: "Game state not found or expired" });
         return;
       }
 
+      // IMPORTANT: Keep both gameBalance and buyIn to determine how much money gain/loss after the game
       gameState.players.push({
         id: userId,
         socketId: socket.id,
-        name: playerName,
+        name: user.fullName,
         hand: [],
-        buyIn,
-        gameBalance,
+        buyIn: room.buyIn,
+        gameBalance: room.buyIn,
         mustBeat: false,
         state: "waitingForTurn",
       });
 
-      await updateGameState(roomId, gameState);
+      await updateGameState(room.roomId, gameState);
 
       const updatedRoomPlayerStatus = await updateRoomPlayerStatus(room.id, userId, "joined");
       if (!updatedRoomPlayerStatus) {
@@ -108,7 +98,7 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
 
       log("Add user", userId, "to room:", room.id, "info");
 
-      io.to(roomId).emit("roomUpdate", gameState);
+      io.to(room.roomId).emit("roomUpdate", gameState);
 
       // Boolean to check if the user is the host => corresponding change in join-room UI
       const isHost = room.hostUserId === userId;

@@ -14,6 +14,6 @@ export interface IRoomRepository {
 
   getJoinedPlayersFromRoom(roomId: number): Promise<number[] | null>;
 
-  updateRoomPlayerStatus(roomId: number, userId: number, status: "joined" | "left" | "kicked"): Promise<RoomPlayer | null>;
+  updateRoomPlayerStatus(roomId: number, userId: number, status: "accepted" | "declined" | "canceled" | "joined" | "left" | "kicked"): Promise<RoomPlayer | null>;
 
 }

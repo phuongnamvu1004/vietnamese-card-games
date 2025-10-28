@@ -4,10 +4,8 @@ export interface Room {
   hostUserId: number;
   gameType: "sam" | "phom";
   maxPlayers: number;
-  players: number[]; // user ID
   buyIn: number;
   betUnit: number;
-  isOnline: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,7 +13,7 @@ export interface Room {
 export interface RoomPlayer {
   roomId: number;
   userId: number;
-  status: "host" | "invited" | "accepted" | "declined" | "joined" | "left" | "kicked";
+  status: "host" | "invited" | "accepted" | "declined" | "canceled" | "joined" | "left" | "kicked";
   invitedBy: number; // invitor user ID
   invitedAt: Date | null;
   joinedAt: Date | null;

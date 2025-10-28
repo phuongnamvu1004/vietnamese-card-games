@@ -36,7 +36,7 @@ CREATE TABLE game_logs
 );
 
 -- room_players and room_invitations tables
-CREATE TYPE room_player_status AS ENUM ('host','invited','accepted','declined', 'joined', 'left','kicked');
+CREATE TYPE room_player_status AS ENUM ('host', 'invited', 'accepted', 'declined', 'canceled', 'joined', 'left', 'kicked');
 CREATE TABLE room_players
 (
     room_id    INTEGER            NOT NULL REFERENCES rooms (id) ON DELETE CASCADE,
@@ -60,16 +60,19 @@ CREATE INDEX idx_room_players_status ON room_players (status);
 CREATE TYPE invitation_status AS ENUM ('pending','accepted','declined','canceled','expired');
 CREATE TABLE invitations
 (
-    invitor_id INTEGER           NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    invitee_id INTEGER           NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    room_id    INTEGER           NOT NULL REFERENCES rooms (id) ON DELETE CASCADE,
-    status     invitation_status NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMPTZ,
-    expired_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ,
+    invitor_id   INTEGER           NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    invitee_id   INTEGER           NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    room_id      INTEGER           NOT NULL REFERENCES rooms (id) ON DELETE CASCADE,
+    invite_token VARCHAR(255)      NOT NULL,
+    status       invitation_status NOT NULL DEFAULT 'pending',
+    created_at   TIMESTAMPTZ,
+    expired_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ,
 
     PRIMARY KEY (invitor_id, invitee_id, room_id)
 )
+
+CREATE INDEX idx_invitations_invite_token ON invitations (invite_token);
 
 -- user_statistics tables for different game types
 CREATE TABLE user_statistics_sam

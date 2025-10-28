@@ -12,9 +12,9 @@ export class InvitationController implements IInvitationController {
   public acceptInvitation = async (req: Request, res: Response) => {
     try {
       const userId = req.user!.id;
-      const { invitorId, roomId } = req.body;
+      const { invitorId, roomId, inviteToken } = req.body;
 
-      const result = await this._invitationService.acceptInvitation({ invitorId, inviteeId: userId, roomId }, getIo());
+      const result = await this._invitationService.acceptInvitation({ invitorId, inviteeId: userId, roomId, inviteToken }, getIo());
       res.status(200).json(result);
     } catch (error: unknown) {
       invitationControllerErrorHandler(error, "accept", res);
@@ -24,12 +24,13 @@ export class InvitationController implements IInvitationController {
   public declineInvitation = async (req: Request, res: Response) => {
     try {
       const userId = req.user!.id;
-      const { invitorId, roomId } = req.body;
+      const { invitorId, roomId, inviteToken } = req.body;
 
       const updatedInvitation = await this._invitationService.declineInvitation({
         invitorId,
         inviteeId: userId,
-        roomId
+        roomId,
+        inviteToken
       }, getIo());
       res.status(200).json(updatedInvitation);
     } catch (error: unknown) {
@@ -40,9 +41,9 @@ export class InvitationController implements IInvitationController {
   public cancelInvitation = async (req: Request, res: Response) => {
     try {
       const invitorId = req.user!.id;
-      const { inviteeId, roomId } = req.body;
+      const { inviteeId, roomId, inviteToken } = req.body;
 
-      const updatedInvitation = await this._invitationService.cancelInvitation({ invitorId, inviteeId, roomId }, getIo());
+      const updatedInvitation = await this._invitationService.cancelInvitation({ invitorId, inviteeId, roomId, inviteToken }, getIo());
       res.status(200).json(updatedInvitation);
     } catch (error: unknown) {
       invitationControllerErrorHandler(error, "cancel", res);

@@ -6,12 +6,14 @@ import { supabase } from "../databases/supabase";
 import { RoomRepository } from "../repositories/room.repository";
 import { InvitationRepository } from "../repositories/invitation.repository";
 import { InvitationService } from "../services/invitation.service";
+import { InvitationGuardService } from "../services/invitation-guard.service";
 
 const router = express.Router();
 
 const roomRepo = new RoomRepository(supabase);
 const invitationRepo = new InvitationRepository(supabase);
-const invitationService = new InvitationService(roomRepo, invitationRepo)
+const invitationGuardService = new InvitationGuardService(invitationRepo);
+const invitationService = new InvitationService(roomRepo, invitationRepo, invitationGuardService);
 const invitationController = new InvitationController(invitationService);
 
 // For invitee to respond to an invitation
