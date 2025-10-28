@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../lib/axios";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
 import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import Neonbutton from "../Components/ui/NeonButton.tsx";
+import NeonButton from "../Components/ui/NeonButton";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
+import { UserAPI } from "../api/UserApi";
 
 const Login: React.FC = () => {
+  const [user, setUser] = useState<{ fullName?: string }>({});
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -19,8 +20,18 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const checkUser = async () => {
+      try {
+        const res = await UserAPI.checkAuth();
+        setUser({ fullName: res.data.fullName });
+        navigate("/welcome");
+      } catch {
+        setUser({});
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkUser();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,26 +46,12 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log("Logging in with data:", formData);
-      await axiosInstance.post(
-        "api/auth/login",
-        {
-          email: formData.email,
-          password: formData.password,
-        },
-      );
-
+      await UserAPI.login(formData);
       setMessage("Login successful! Redirecting...");
-      setFormData({ email: "", password: "" });
-
-      setTimeout(() => {
-        setIsLoading(false);
-        navigate("/profile");
-      }, 2000);
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      console.error("Login error:", err.response?.data);
-      setError(err.response?.data?.message || "Invalid email or password. Please try again.");
+      navigate("/welcome");
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Invalid email or password.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -85,7 +82,7 @@ const Login: React.FC = () => {
 
   return (
     <CyberpunkLayout isLoading={isLoading} loadingText="VERIFYING ACCESS">
-      <Logo subtitle="/ ACCESS YOUR ACCOUNT /" size="md" />
+      <Logo subtitle={`/ ACCESS YOUR ACCOUNT / ${user?.fullName || ""}`} size="md" />
 
       <div className="relative z-10 pt-32 flex flex-col items-center justify-center min-h-screen px-4">
         <AuthFormLayout title="LOGIN">
@@ -122,14 +119,14 @@ const Login: React.FC = () => {
               </Link>
             </div>
 
-            <Neonbutton
+            <NeonButton
               type="submit"
               color="pink"
               fullWidth
               disabled={isLoading}
             >
               {isLoading ? "AUTHENTICATING..." : "LOGIN"}
-            </Neonbutton>
+            </NeonButton>
 
             <div className="mt-6 text-center">
               <p className="text-gray-300 text-sm font-mono">

@@ -8,17 +8,14 @@ import Navbar from "../../Components/Layout/Navbar";
 const NUM_PLAYERS = 4;
 
 const Sam: React.FC = () => {
-  // Initialize deck and hands once on mount
   const [hands, setHands] = useState<Card[][]>(() =>
     dealCards(shuffleDeck(Card.createDeck()), NUM_PLAYERS, "sam")
   );
   const [playedCards, setPlayedCards] = useState<Card[]>([]);
 
-  // Play selected cards from player's hand (assuming player is at index 0)
   const handlePlay = (selectedCards: Card[]) => {
     setHands((prevHands) => {
       const newHands = [...prevHands];
-      // Remove selected cards from player's hand (player 0) by string identity
       newHands[0] = newHands[0].filter(
         (card) =>
           !selectedCards.some(
@@ -32,7 +29,6 @@ const Sam: React.FC = () => {
     setPlayedCards((prev) => [...prev, ...selectedCards]);
   };
 
-  // Pass turn (no-op or log for now)
   const handlePass = () => {
     console.log("Player passed.");
   };

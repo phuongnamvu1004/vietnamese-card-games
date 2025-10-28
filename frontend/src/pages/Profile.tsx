@@ -1,81 +1,49 @@
 import React, { useEffect, useState } from "react";
 import defaultAvatar from "../assets/default-avatar.png";
 import { Link } from "react-router-dom";
-import { axiosInstance } from "../lib/axios";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
-
-interface User {
-  id: number;
-  fullName: string;
-  profilePic: string;
-}
-
-interface UserStatistics {
-  gamesPlayed: number;
-  wins: number;
-  losses: number;
-  winRate: number;
-  specialWins: number;
-}
+import { UserAPI } from "../api/UserApi";
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<User>({
-    id: 0,
-    fullName: "",
-    profilePic: defaultAvatar,
-  });
-
-  const [statistics, setStatistics] = useState<UserStatistics>({
-    gamesPlayed: 0,
-    wins: 0,
-    losses: 0,
-    winRate: 0,
-    specialWins: 0,
-  });
-
+  const [user, setUser] = useState({ id: 0, fullName: "", profilePic: defaultAvatar });
+  const [stats, setStats] = useState({ gamesPlayed: 0, wins: 0, losses: 0, winRate: 0, specialWins: 0 });
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await axiosInstance.get("/api/user/user-profile");
-        const statsRes = await axiosInstance.get("/api/user/user-statistics");
+        const [profileRes, statsRes] = await Promise.all([
+          UserAPI.getProfile(),
+          UserAPI.getStatistics(),
+        ]);
+
+        const profile = profileRes.data;
+        const stats = statsRes.data;
 
         setUser({
-          id: userRes.data.id,
-          fullName: userRes.data.fullName,
-          profilePic: userRes.data.profilePic || defaultAvatar,
+          id: profile.id,
+          fullName: profile.fullName,
+          profilePic: profile.profilePic || defaultAvatar,
         });
 
-        const samData = statsRes.data.samData || {};
-        const phomData = statsRes.data.phomData || {};
+        const samData = stats.samData || {};
+        const phomData = stats.phomData || {};
 
-        const samGames = samData.gamesPlayed || 0;
-        const phomGames = phomData.gamesPlayed || 0;
-        const samWins = samData.wins || 0;
-        const phomWins = phomData.wins || 0;
-
+        const gamesPlayed = (samData.gamesPlayed || 0) + (phomData.gamesPlayed || 0);
+        const wins = (samData.wins || 0) + (phomData.wins || 0);
+        const losses = gamesPlayed - wins;
         const winRate = samData.winRate || 0;
-        const specialWins =
-          (samData.instantWins?.dragonStraight || 0) +
-          (samData.instantWins?.fourTwos || 0) +
-          (samData.instantWins?.flushHand || 0) +
-          (samData.instantWins?.threeTriplets || 0) +
-          (samData.instantWins?.fivePairs || 0);
+        const specialWins = Object.values(samData.instantWins || {}).reduce(
+          (a: number, b) => a + Number(b),
+          0
+        );
 
-        setStatistics({
-          gamesPlayed: samGames + phomGames,
-          wins: samWins + phomWins,
-          losses: samGames + phomGames - (samWins + phomWins),
-          winRate,
-          specialWins,
-        });
+        setStats({ gamesPlayed, wins, losses, winRate, specialWins });
       } catch (error) {
-        console.error("Failed to fetch profile data", error);
+        console.error("Failed to fetch profile data:", error);
       }
     };
-
     fetchUserData();
   }, []);
 
@@ -87,7 +55,7 @@ const Profile: React.FC = () => {
     reader.onloadend = async () => {
       try {
         setUploading(true);
-        await axiosInstance.post("/api/user/profile", { profilePic: reader.result });
+        await UserAPI.updateProfilePic(reader.result as string);
         setUser((prev) => ({ ...prev, profilePic: reader.result as string }));
       } catch (error) {
         console.error("Failed to upload new profile picture", error);
@@ -136,30 +104,30 @@ const Profile: React.FC = () => {
           {/* Statistics */}
           <div className="grid grid-cols-2 gap-4 text-center font-mono text-cyan-200">
             <div>
-              <div className="text-lg font-bold">{statistics.gamesPlayed}</div>
+              <div className="text-lg font-bold">{stats.gamesPlayed}</div>
               <div className="text-xs text-gray-400">Games Played</div>
             </div>
             <div>
-              <div className="text-lg font-bold">{statistics.wins}</div>
+              <div className="text-lg font-bold">{stats.wins}</div>
               <div className="text-xs text-gray-400">Wins</div>
             </div>
             <div>
-              <div className="text-lg font-bold">{statistics.losses}</div>
+              <div className="text-lg font-bold">{stats.losses}</div>
               <div className="text-xs text-gray-400">Losses</div>
             </div>
             <div>
-              <div className="text-lg font-bold">{statistics.winRate.toFixed(1)}%</div>
+              <div className="text-lg font-bold">{stats.winRate.toFixed(1)}%</div>
               <div className="text-xs text-gray-400">Win Rate</div>
             </div>
             <div>
-              <div className="text-lg font-bold">{statistics.specialWins}</div>
+              <div className="text-lg font-bold">{stats.specialWins}</div>
               <div className="text-xs text-gray-400">Special Wins</div>
             </div>
           </div>
 
           <div className="mt-8 text-center">
             <Link
-              to="/game"
+              to="/welcome"
               className="inline-block px-6 py-3 rounded-md bg-cyan-500/20 text-cyan-400 border border-cyan-500 hover:text-white hover:shadow-[0_0_20px_rgba(6,182,212,0.7)] transition-all font-mono"
             >
               Go to Game

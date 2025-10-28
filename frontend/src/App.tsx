@@ -3,8 +3,9 @@ import Home from "./pages/Home"; // This is now your Welcome page
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
-import Game from "./pages/Welcome";
+import Welcome from "./pages/Welcome";
 import Sam from "./pages/Game/Sam";
+import CreateRoom from "./socket/CreateRoom";
 
 const App = () => {
   return (
@@ -14,8 +15,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/game" element={<Game/>}/>
+        <Route path="/welcome" element={<Welcome/>}/>
         <Route path="/game/sam" element={<Sam />} />
+        <Route path="/create-room" element={<CreateRoom />} />
       </Routes>
     </div>
   );
