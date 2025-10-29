@@ -3,13 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
 import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import Neonbutton from "../Components/ui/NeonButton.tsx";
+import NeonButton from "../Components/ui/NeonButton";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
-import { UserAPI } from "../api/UserApi.ts";
+import { UserAPI } from "../api/UserApi";
+import { useSocket } from "../socket/SocketProvider";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const { connectSocket } = useSocket();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -29,9 +31,9 @@ const SignUp: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
-    const { name, value } = e.target; 
-    setFormData({ ...formData, [name]: value }); 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,20 +49,28 @@ const SignUp: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await UserAPI.signup({
+      const user = await UserAPI.signup({
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
       });
+      localStorage.setItem("user", JSON.stringify(user));
 
-      setMessage("Signup successful! Redirecting to login...");
-      navigate("/login");
+      const token = await UserAPI.refreshToken();
+      if (token) {
+        localStorage.setItem("token", token);
+        connectSocket(token);
+      }
+      setMessage("Signup successful! Redirecting...");
+      setTimeout(() => navigate("/welcome"), 1500);
     } catch (error: any) {
-      setError(error.response?.data?.message || "Something went wrong.");
+      console.error("Signup error:", error);
+      setError(error.response?.data?.message || error.message || "Something went wrong.");
     } finally {
       setIsLoading(false);
     }
   };
+
   type InputField = {
     id: keyof typeof formData;
     label: string;
@@ -70,32 +80,10 @@ const SignUp: React.FC = () => {
   };
 
   const inputConfigs: InputField[] = [
-    {
-      id: "fullName",
-      label: "FULL NAME",
-      type: "text",
-      placeholder: "Enter your full name",
-    },
-    {
-      id: "email",
-      label: "EMAIL",
-      type: "email",
-      placeholder: "Enter your email address",
-    },
-    {
-      id: "password",
-      label: "PASSWORD",
-      type: "password",
-      placeholder: "Create a password",
-      toggle: true,
-    },
-    {
-      id: "confirmPassword",
-      label: "CONFIRM PASSWORD",
-      type: "password",
-      placeholder: "Confirm your password",
-      toggle: true,
-    },
+    { id: "fullName", label: "FULL NAME", type: "text", placeholder: "Enter your full name" },
+    { id: "email", label: "EMAIL", type: "email", placeholder: "Enter your email address" },
+    { id: "password", label: "PASSWORD", type: "password", placeholder: "Create a password", toggle: true },
+    { id: "confirmPassword", label: "CONFIRM PASSWORD", type: "password", placeholder: "Confirm your password", toggle: true },
   ];
 
   return (
@@ -128,14 +116,9 @@ const SignUp: React.FC = () => {
               />
             ))}
 
-            <Neonbutton
-              type="submit"
-              color="pink"
-              fullWidth
-              disabled={isLoading}
-            >
+            <NeonButton type="submit" color="pink" fullWidth disabled={isLoading}>
               {isLoading ? "PROCESSING..." : "CREATE ACCOUNT"}
-            </Neonbutton>
+            </NeonButton>
 
             <div className="mt-6 text-center">
               <p className="text-gray-300 text-sm font-mono">
@@ -150,16 +133,6 @@ const SignUp: React.FC = () => {
             </div>
           </form>
         </AuthFormLayout>
-
-        <div className="mt-8 text-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-mono text-sm"
-          >
-            <span className="mr-2">←</span>
-            BACK TO HOME
-          </Link>
-        </div>
       </div>
     </CyberpunkLayout>
   );

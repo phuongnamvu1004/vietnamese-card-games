@@ -7,6 +7,7 @@ import NeonButton from "../Components/ui/NeonButton";
 import AuthMessageBox from "../Components/ui/AuthMessageBox";
 import AuthFormLayout from "../Components/ui/AuthFormLayout";
 import { UserAPI } from "../api/UserApi";
+import { useSocket } from "../socket/SocketProvider"; 
 
 const Login: React.FC = () => {
   const [user, setUser] = useState<{ fullName?: string }>({});
@@ -18,6 +19,7 @@ const Login: React.FC = () => {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const { connectSocket } = useSocket();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -32,7 +34,7 @@ const Login: React.FC = () => {
       }
     };
     checkUser();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,11 +48,14 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await UserAPI.login(formData);
-      setMessage("Login successful! Redirecting...");
-      navigate("/welcome");
+      const res = await UserAPI.login(formData);
+      localStorage.setItem("user", JSON.stringify(res.data));
+      const token = await UserAPI.refreshToken();
+      if (token) connectSocket(token);
+      setTimeout(() => navigate("/welcome"), 1500);
     } catch (error: any) {
-      setError(error.response?.data?.message || "Invalid email or password.");
+      console.error("Login error:", error);
+      setError(error.response?.data?.message || error.message || "Invalid email or password.");
     } finally {
       setIsLoading(false);
     }
@@ -119,12 +124,7 @@ const Login: React.FC = () => {
               </Link>
             </div>
 
-            <NeonButton
-              type="submit"
-              color="pink"
-              fullWidth
-              disabled={isLoading}
-            >
+            <NeonButton type="submit" color="pink" fullWidth disabled={isLoading}>
               {isLoading ? "AUTHENTICATING..." : "LOGIN"}
             </NeonButton>
 

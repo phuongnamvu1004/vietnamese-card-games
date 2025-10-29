@@ -29,7 +29,7 @@ export class AuthService implements IAuthService {
     if (user) {
       log("Email already exists", "warn");
       throw new Error("Email already exists");
-    }
+    } 
 
     // Implementation of signup logic
     const salt = await bcrypt.genSalt(10);
