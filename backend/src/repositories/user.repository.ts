@@ -11,7 +11,8 @@ export class UserRepository implements IUserRepository {
   constructor(
     private readonly _db: SupabaseClient
   ) {}
-  async createUser (user: CreateUserRepoDTO): Promise<SafeUser | null> {
+
+  async createUser(user: CreateUserRepoDTO): Promise<SafeUser | null> {
     const { data, error } = await this._db
       .from("users")
       .insert([
@@ -49,7 +50,7 @@ export class UserRepository implements IUserRepository {
     return mapUserData(data);
   };
 
-  async findUserByEmail (email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<User | null> {
     const { data, error } = await this._db
       .from("users")
       .select("*")
@@ -64,7 +65,7 @@ export class UserRepository implements IUserRepository {
     return mapUserData(data);
   };
 
-  async updateUserProfilePic (
+  async updateUserProfilePic(
     userId: number,
     profilePicUrl: string,
   ): Promise<SafeUser | null> {
@@ -80,7 +81,7 @@ export class UserRepository implements IUserRepository {
     return mapSafeUserData(data);
   };
 
-  async getUserById (id: number): Promise<SafeUser | null> {
+  async getUserById(id: number): Promise<SafeUser | null> {
     const { data, error } = await this._db
       .from("users")
       .select("id, email, full_name, profile_pic, balance, created_at, updated_at")
@@ -91,6 +92,18 @@ export class UserRepository implements IUserRepository {
 
     return mapSafeUserData(data);
   };
+
+  async updateUserBalance(id: number, delta: number): Promise<SafeUser | null> {
+    const { data, error } = await this._db
+      .rpc("add_to_user_balance", { p_user_id: id, p_delta: delta })
+      .single();
+
+    if (error || !data) {
+      log("addToUserBalance error:", error, "error");
+      return null;
+    }
+    return mapSafeUserData(data as Record<string, unknown>);
+  }
 }
 
 export const userRepository = new UserRepository(supabase);
@@ -102,3 +115,7 @@ export const getUserById = (...args: Parameters<UserRepository["getUserById"]>) 
 // Singleton export for socket-auth.middleware
 export const findUserById = (...args: Parameters<UserRepository["findUserById"]>) =>
   userRepository.findUserById(...args);
+
+// Singleton export for leave-room.handler
+export const updateUserBalance = (...args: Parameters<UserRepository["updateUserBalance"]>) =>
+  userRepository.updateUserBalance(...args);

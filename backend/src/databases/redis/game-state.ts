@@ -4,7 +4,7 @@ import { CurrentGameState } from "../../types/game";
 const getGameStateKey = (roomId: string) => `gameState:${roomId}`;
 
 // Get the current game state
-export const getGameState = async (roomId: string) => {
+export const getGameState = async (roomId: string): Promise<CurrentGameState | null> => {
   const gameState = await redisClient.get(getGameStateKey(roomId));
   return gameState ? JSON.parse(gameState) : null;
 };

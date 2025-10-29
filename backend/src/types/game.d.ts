@@ -9,7 +9,7 @@ type Player = {
   buyIn: number;
   gameBalance: number;
   numWins: number;
-  numLosses: number;
+  totalGames: number;
   mustBeat: boolean;
   state: "instantWin" | "waitingForTurn" | "inTurn";
 };

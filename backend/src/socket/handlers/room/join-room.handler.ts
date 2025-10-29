@@ -83,6 +83,8 @@ export const handleJoinRoom = (io: Server, socket: Socket) => {
         hand: [],
         buyIn: room.buyIn,
         gameBalance: room.buyIn,
+        numWins: 0,
+        totalGames: 0,
         mustBeat: false,
         state: "waitingForTurn",
       });
