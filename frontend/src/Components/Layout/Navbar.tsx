@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
-import defaultAvatar from "../../assets/default-avatar.png"; // ✅ Add this
+import defaultAvatar from "../../assets/default-avatar.png";
 import Logo from "../ui/Logo";
+import { useLogout } from "../../pages/Logout"; 
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<null | { fullName: string; profilePicture: string }>(null);
   const navigate = useNavigate();
+  const { handleLogout } = useLogout(); 
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axiosInstance.get("/api/user/user-profile"); // ✅ use correct backend route
+        const res = await axiosInstance.get("/api/user/user-profile");
         setUser({
           fullName: res.data.fullName,
-          profilePicture: res.data.profilePic || defaultAvatar, // ✅ fallback here
+          profilePicture: res.data.profilePic || defaultAvatar,
         });
       } catch {
         setUser(null);
@@ -22,16 +24,6 @@ const Navbar: React.FC = () => {
     };
     fetchUser();
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await axiosInstance.post("/api/auth/logout");
-      setUser(null);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
   return (
     <nav className="w-full flex items-center justify-between px-8 py-4 bg-gray-900/80 backdrop-blur-md shadow-md">
@@ -64,7 +56,10 @@ const Navbar: React.FC = () => {
               </Link>
             </li>
             <li>
-              <button onClick={handleLogout} className="text-red-400 hover:text-red-300 transition">
+              <button
+                onClick={handleLogout}
+                className="text-red-400 hover:text-red-300 transition"
+              >
                 Logout
               </button>
             </li>
