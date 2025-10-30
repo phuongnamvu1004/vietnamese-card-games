@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "../../../../backend/src/game/shared/cards";
-import CardDisplay from "../../Components/ui/card/CardDisplay";
+import CardDisplay from "./card/CardDisplay";
 
 interface TableProps {
   playedCards: Card[];

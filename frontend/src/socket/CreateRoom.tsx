@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoomApi } from "../api/RoomApi";
 import { useSocket } from "./SocketProvider";
-import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import NeonButton from "../Components/ui/NeonButton";
-import AuthFormLayout from "../Components/ui/AuthFormLayout";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
+import CyberpunkInput from "../components/ui/CyberpunkInput";
+import NeonButton from "../components/ui/NeonButton";
+import AuthFormLayout from "../components/ui/AuthFormLayout";
+import CyberpunkLayout from "../components/Layout/CyberpunkLayout";
 
 const CreateRoom: React.FC = () => {
   const navigate = useNavigate();

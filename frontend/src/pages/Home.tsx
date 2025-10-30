@@ -1,15 +1,13 @@
 import { UserAPI } from "../api/UserApi";
 import React, { useEffect, useState } from "react";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
-import Logo from "../Components/ui/Logo";
-import Neonbutton from "../Components/ui/NeonButton.tsx";
-import PokerChip from "../Components/ui/PokerChip";
-import CardFan from "../Components/ui/card/CardFan.tsx";
-import Dice3D from "../Components/ui/Dice";
-import Coin from "../Components/ui/Coin";
-import LoginToast from "../Components/ui/LoginToast.tsx";
-
-
+import CyberpunkLayout from "../components/Layout/CyberpunkLayout.tsx";
+import Logo from "../components/ui/Logo.tsx";
+import Neonbutton from "../components/ui/NeonButton.tsx";
+import PokerChip from "../components/ui/PokerChip.tsx";
+import CardFan from "../components/ui/card/CardFan.tsx";
+import Dice3D from "../components/ui/Dice.tsx";
+import Coin from "../components/ui/Coin.tsx";
+import LoginToast from "../components/ui/LoginToast.tsx";
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,10 +49,8 @@ const Home: React.FC = () => {
   return (
     <CyberpunkLayout isLoading={isLoading}>
       {user && <LoginToast />}
-      {/* Logo */}
       <Logo />
 
-      {/* Background grid & lines */}
       <div
         className="absolute inset-0 opacity-5 bg-repeat mix-blend-overlay"
         style={{ backgroundImage: `url('/textures/digital-noise.png')` }}
@@ -62,7 +58,6 @@ const Home: React.FC = () => {
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/70 to-cyan-500/0"></div>
       <div className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/70 to-cyan-500/0"></div>
 
-      {/* Poker Chips */}
       {chips.map((chip, index) => (
         <PokerChip
           key={index}
@@ -118,17 +113,14 @@ const Home: React.FC = () => {
           )}
         </div>
 
-        {/* RIGHT SECTION */}
         <div className="w-1/2 flex items-center justify-center relative pr-20">
           <div className="absolute inset-0 flex justify-center items-center translate-y-[-40px]">
-            {/* Neon aura glow behind cards */}
             <div className="absolute w-[420px] h-[270px] bg-cyan-400/20 blur-3xl rounded-full animate-pulse"></div>
             <Coin style={{ top: "5%", left: "20%", position: "absolute" }} size={80} />
             <Coin style={{ top: "20%", right: "10%", position: "absolute" }} size={90} />
             <Coin style={{ bottom: "10%", left: "15%", position: "absolute" }} size={70} />
             <Coin style={{ bottom: "20%", right: "20%", position: "absolute" }} size={100} />
             <Coin style={{ top: "50%", left: "0%", position: "absolute" }} size={60} />
-            {/* Card Fan */}
             <div className="relative z-10 transform scale-125 rotate-2 hover:scale-130 transition-transform duration-500 animate-float">
               <CardFan />
             </div>

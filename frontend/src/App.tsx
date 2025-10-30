@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Welcome from "./pages/Welcome";
-import Sam from "./pages/Game/Sam";
+import Sam from "./pages/game/Sam";
 import CreateRoom from "./socket/CreateRoom";
 
 const App = () => {
