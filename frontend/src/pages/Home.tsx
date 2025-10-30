@@ -1,3 +1,4 @@
+import { UserAPI } from "../api/UserApi";
 import React, { useEffect, useState } from "react";
 import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
 import Logo from "../Components/ui/Logo";
@@ -6,14 +7,31 @@ import PokerChip from "../Components/ui/PokerChip";
 import CardFan from "../Components/ui/card/CardFan.tsx";
 import Dice3D from "../Components/ui/Dice";
 import Coin from "../Components/ui/Coin";
+import LoginToast from "../Components/ui/LoginToast.tsx";
+
+
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredChip, setHoveredChip] = useState<number | null>(null);
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const fetchUser = async () => {
+      const token = await UserAPI.refreshToken();
+      if (token) {
+        try {
+          const res = await UserAPI.getProfile();
+          setUser(res.data);
+        } catch {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+    fetchUser();
+    setIsLoading(false);
   }, []);
 
   const chips = [
@@ -27,11 +45,12 @@ const Home: React.FC = () => {
     { top: "15%", left: "5%", rotate: "15deg" },
     { top: "75%", left: "7%", rotate: "-10deg" },
     { top: "25%", left: "30%", rotate: "20deg" },
-    { top: "65%", left: "28%", rotate: "-15deg" },
+    { top: "65%", left: "35%", rotate: "-15deg" },
   ];
 
   return (
     <CyberpunkLayout isLoading={isLoading}>
+      {user && <LoginToast />}
       {/* Logo */}
       <Logo />
 
@@ -63,21 +82,40 @@ const Home: React.FC = () => {
       <div className="relative z-10 flex h-screen pt-24">
         {/* LEFT SECTION */}
         <div className="w-1/2 flex flex-col justify-center items-start pl-20 pr-10">
-          <h1 className="text-3xl font-extrabold text-white leading-tight mb-8 tracking-wide drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">
+          <h1 className="text-3xl font-extrabold text-white leading-tight mb-8 ml-18 tracking-wide drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">
             / FUTURISTIC VIETNAMESE GAMING EXPERIENCE /
           </h1>
-          <p className="mt-4 text-cyan-300 text-2xl font-medium font-mono tracking-wider glitch-text">
-            TRADITIONAL GAMES
+          <p className="mt-4 text-cyan-300 text-2xl font-medium font-mono tracking-wider glitch-text ml-48">
+            *TRADITIONAL GAMES*
           </p>
 
-          <div className="flex flex-col gap-6 w-96 mt-16">
-            <Neonbutton to="/login" color="cyan" fullWidth size="lg">
-              LOGIN
-            </Neonbutton>
-            <Neonbutton to="/signup" color="pink" fullWidth size="lg">
-              SIGN UP
-            </Neonbutton>
-          </div>
+          {user ? (
+            <div className="mt-16 ml-40 w-[380px] p-4 rounded-lg border border-amber-400/50 bg-amber-900/20 backdrop-blur-md shadow-[0_0_25px_rgba(251,191,36,0.6)] animate-fadeIn">
+              <h2 className="text-amber-300 text-2xl font-bold font-mono mb-2">
+                Welcome back, {user?.fullName || "Player"}! 🎮
+              </h2>
+              <p className="text-amber-200 text-lg font-mono leading-relaxed mb-4">
+                You’re now logged in — enjoy exploring Vietnam’s traditional card games with us!
+              </p>
+              <Neonbutton
+                to="/welcome"
+                color="cyan"
+                size="sm"
+                className="mt-2 font-bold tracking-wide px-4 py-2 rounded-md text-sm hover:brightness-110 active:scale-95 transition-all"
+              >
+                START PLAYING
+              </Neonbutton>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 w-96 mt-16 ml-40">
+              <Neonbutton to="/login" color="cyan" fullWidth size="lg">
+                LOGIN
+              </Neonbutton>
+              <Neonbutton to="/signup" color="pink" fullWidth size="lg">
+                SIGN UP
+              </Neonbutton>
+            </div>
+          )}
         </div>
 
         {/* RIGHT SECTION */}
@@ -141,6 +179,13 @@ const Home: React.FC = () => {
         }
         .neon-flicker {
           animation: flicker 3s infinite;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out;
         }
       `}</style>
     </CyberpunkLayout>

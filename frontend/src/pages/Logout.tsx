@@ -8,9 +8,9 @@ export const useLogout = () => {
     const navigate = useNavigate();
     const handleLogout = useCallback(async () => {
         try {
-          await UserAPI.logout(); 
-          disconnectSocket(); 
           localStorage.removeItem("token");
+          disconnectSocket();
+          await UserAPI.logout(); 
           console.log("Logged out successfully");
           navigate("/login");
         } catch (err) {

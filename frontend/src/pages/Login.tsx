@@ -23,11 +23,19 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const checkUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token found, skipping checkAuth.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const res = await UserAPI.checkAuth();
         setUser({ fullName: res.data.fullName });
         navigate("/welcome");
-      } catch {
+      } catch (err) {
+        console.warn("User not logged in or token invalid.");
         setUser({});
       } finally {
         setIsLoading(false);
@@ -52,7 +60,7 @@ const Login: React.FC = () => {
       localStorage.setItem("user", JSON.stringify(res.data));
       const token = await UserAPI.refreshToken();
       if (token) connectSocket(token);
-      setTimeout(() => navigate("/welcome"), 1500);
+      setTimeout(() => navigate("/welcome"));
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error.response?.data?.message || error.message || "Invalid email or password.");
