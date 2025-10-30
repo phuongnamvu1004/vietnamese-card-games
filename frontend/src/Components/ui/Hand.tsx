@@ -2,7 +2,7 @@
 // Features: cards slightly overlapped, hover animation, selection toggle
 
 import { useState } from "react";
-import CardDisplay from "../../Components/ui/card/CardDisplay";
+import CardDisplay from "./card/CardDisplay";
 import { Card } from "../../../../backend/src/game/shared/cards";
 
 interface HandProps {

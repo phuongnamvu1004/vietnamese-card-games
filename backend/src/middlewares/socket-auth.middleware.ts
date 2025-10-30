@@ -1,4 +1,3 @@
-// src/middleware/socketAuth.ts
 import { Socket } from "socket.io";
 import jwt from "jsonwebtoken";
 import { findUserById } from "../repositories/user.repository";
@@ -24,14 +23,15 @@ export async function socketAuth(socket: Socket, next: (err?: Error) => void) {
     }
     const decoded = decodedRaw as JwtPayload;
 
-    // Normalize sub → number
-    const subValue = Number(decoded.sub);
-    if (!Number.isFinite(subValue)) {
+    // Support both userId and sub fields for user identification
+    const userIdRaw = (decoded as any).userId || decoded.sub;
+    const userId = Number(userIdRaw);
+    if (!Number.isFinite(userId)) {
       return next(new Error("Unauthorized: invalid subject"));
     }
 
     // 3) (Optional but good) Check user exists/active in DB
-    const user = await findUserById(subValue);
+    const user = await findUserById(userId);
     if (!user) return next(new Error("Unauthorized: user not found"));
 
     // 4) Attach and join a per-user room

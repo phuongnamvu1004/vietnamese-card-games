@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
-import Logo from "../Components/ui/Logo";
-import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import NeonButton from "../Components/ui/NeonButton";
-import AuthMessageBox from "../Components/ui/AuthMessageBox";
-import AuthFormLayout from "../Components/ui/AuthFormLayout";
+import CyberpunkLayout from "../components/Layout/CyberpunkLayout";
+import Logo from "../components/ui/Logo";
+import CyberpunkInput from "../components/ui/CyberpunkInput";
+import NeonButton from "../components/ui/NeonButton";
+import AuthMessageBox from "../components/ui/AuthMessageBox";
+import AuthFormLayout from "../components/ui/AuthFormLayout";
 import { UserAPI } from "../api/UserApi";
 import { useSocket } from "../socket/SocketProvider"; 
 
@@ -23,11 +23,19 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const checkUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token found, skipping checkAuth.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const res = await UserAPI.checkAuth();
         setUser({ fullName: res.data.fullName });
         navigate("/welcome");
-      } catch {
+      } catch (err) {
+        console.warn("User not logged in or token invalid.");
         setUser({});
       } finally {
         setIsLoading(false);
@@ -52,7 +60,7 @@ const Login: React.FC = () => {
       localStorage.setItem("user", JSON.stringify(res.data));
       const token = await UserAPI.refreshToken();
       if (token) connectSocket(token);
-      setTimeout(() => navigate("/welcome"), 1500);
+      setTimeout(() => navigate("/welcome"));
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error.response?.data?.message || error.message || "Invalid email or password.");

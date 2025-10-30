@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Card, shuffleDeck, dealCards } from "../../../../backend/src/game/shared/cards";
-import Hand from "../../Components/ui/Hand";
-import Table from "../../Components/ui/Table";
-import CyberpunkLayout from "../../Components/Layout/CyberpunkLayout";
-import Navbar from "../../Components/Layout/Navbar";
+import Hand from "../../components/ui/Hand";
+import Table from "../../components/ui/Table";
+import CyberpunkLayout from "../../components/Layout/CyberpunkLayout";
+import Navbar from "../../components/Layout/Navbar";
 
 const NUM_PLAYERS = 4;
 

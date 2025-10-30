@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Components/Layout/Navbar.tsx";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout.tsx";
-import NeonButton from "../Components/ui/NeonButton.tsx";
-import PokerChip from "../Components/ui/PokerChip";
+import Navbar from "../components/Layout/Navbar.tsx";
+import CyberpunkLayout from "../components/Layout/CyberpunkLayout.tsx";
+import NeonButton from "../components/ui/NeonButton.tsx";
+import PokerChip from "../components/ui/PokerChip.tsx";
 import { UserAPI } from "../api/UserApi.ts";
 
 const Game: React.FC = () => {
