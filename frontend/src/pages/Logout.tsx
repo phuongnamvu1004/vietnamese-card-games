@@ -7,16 +7,17 @@ export const useLogout = () => {
     const { disconnectSocket } = useSocket();
     const navigate = useNavigate();
     const handleLogout = useCallback(async () => {
-        try {
-          await UserAPI.logout(); 
-          disconnectSocket(); 
-          localStorage.removeItem("token");
-          console.log("Logged out successfully");
-          navigate("/login");
-        } catch (err) {
-          console.error("Logout failed:", err);
-        }
-      }, [disconnectSocket, navigate]);
-    
-      return { handleLogout };
-    };
+      try {
+        await UserAPI.logout();
+        localStorage.removeItem("token");
+        disconnectSocket();
+
+        console.log("Logged out successfully");
+        navigate("/login");
+      } catch (err) {
+        console.error("Logout failed:", err);
+      }
+    }, [disconnectSocket, navigate]);
+  
+    return { handleLogout };
+  };

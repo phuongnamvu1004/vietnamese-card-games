@@ -4,8 +4,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Welcome from "./pages/Welcome";
-import Sam from "./pages/Game/Sam";
+import Sam from "./game/sam/Sam";
 import CreateRoom from "./socket/CreateRoom";
+import WaitingRoom from "./socket/WaitingRoom";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/welcome" element={<Welcome/>}/>
         <Route path="/game/sam" element={<Sam />} />
         <Route path="/create-room" element={<CreateRoom />} />
+        <Route path="/room/:roomId" element={<WaitingRoom gameType="sam" />} />
       </Routes>
     </div>
   );

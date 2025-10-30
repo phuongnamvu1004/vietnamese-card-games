@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
-import Logo from "../Components/ui/Logo";
-import CyberpunkInput from "../Components/ui/CyberpunkInput";
-import NeonButton from "../Components/ui/NeonButton";
-import AuthMessageBox from "../Components/ui/AuthMessageBox";
-import AuthFormLayout from "../Components/ui/AuthFormLayout";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout";
+import Logo from "../components/ui/Logo";
+import CyberpunkInput from "../components/ui/CyberpunkInput";
+import NeonButton from "../components/ui/NeonButton";
+import AuthMessageBox from "../components/ui/AuthMessageBox";
+import AuthFormLayout from "../components/ui/AuthFormLayout";
 import { UserAPI } from "../api/UserApi";
 import { useSocket } from "../socket/SocketProvider";
 
@@ -61,7 +61,6 @@ const SignUp: React.FC = () => {
         localStorage.setItem("token", token);
         connectSocket(token);
       }
-      setMessage("Signup successful! Redirecting...");
       setTimeout(() => navigate("/welcome"), 1500);
     } catch (error: any) {
       console.error("Signup error:", error);

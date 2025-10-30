@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import defaultAvatar from "../assets/default-avatar.png";
 import { Link } from "react-router-dom";
-import CyberpunkLayout from "../Components/Layout/CyberpunkLayout";
-import Logo from "../Components/ui/Logo";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout";
+import Logo from "../components/ui/Logo";
 import { UserAPI } from "../api/UserApi";
 
 const Profile: React.FC = () => {

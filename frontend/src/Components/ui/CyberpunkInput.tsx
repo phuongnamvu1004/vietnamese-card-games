@@ -9,6 +9,10 @@ interface CyberpunkInputProps {
   placeholder?: string;
   required?: boolean;
   minLength?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -27,6 +31,10 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
   placeholder,
   required = false,
   minLength,
+  min,
+  max,
+  step,
+  disabled = false,
   onChange,
   onFocus,
   onBlur,
@@ -37,29 +45,45 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
 }) => {
   return (
     <div className="mb-5">
+      {/* Label */}
       <label
         htmlFor={id}
         className="block mb-2 text-sm font-medium text-cyan-300 font-mono"
       >
         {label}
       </label>
+
+      {/* Input Wrapper */}
       <div
-        className={`relative border ${isFocused ? "border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]" : "border-gray-700"} rounded-md bg-gray-800/50 transition-all duration-300`}
+        className={`relative border ${
+          isFocused
+            ? "border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+            : "border-gray-700"
+        } rounded-md bg-gray-800/50 transition-all duration-300`}
       >
+        {/* Input Field */}
         <input
           type={showPassword ? "text" : type}
           id={id}
           name={name}
           value={value}
-          onChange={onChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
           placeholder={placeholder}
           required={required}
           minLength={minLength}
-          className={`w-full px-4 py-3 bg-transparent text-gray-200 outline-none font-mono ${showPasswordToggle ? "pr-16" : ""}`}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          className={`w-full px-4 py-3 bg-transparent text-gray-200 outline-none font-mono
+            ${showPasswordToggle ? "pr-16" : ""}
+            ${disabled ? "opacity-50 cursor-not-allowed text-gray-400" : ""}
+          `}
         />
 
+        {/* Password Toggle */}
         {showPasswordToggle && (
           <button
             type="button"
@@ -70,6 +94,7 @@ const CyberpunkInput: React.FC<CyberpunkInputProps> = ({
           </button>
         )}
 
+        {/* Focus Glow Border */}
         {isFocused && (
           <div className="absolute -inset-px rounded-md animate-pulse opacity-30 border border-pink-500"></div>
         )}

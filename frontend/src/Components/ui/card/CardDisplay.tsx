@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "../../../../../backend/src/game/shared/cards";
-import CardFront from "../card/CardFront";
-import CardBack from "../card/CardBack";
+import CardFront from "./CardFront";
+import CardBack from "./CardBack";
 
 interface CardProps {
   card: Card;
