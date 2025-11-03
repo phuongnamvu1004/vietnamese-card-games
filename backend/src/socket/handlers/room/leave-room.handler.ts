@@ -84,5 +84,6 @@ export const handleLeaveRoom = (io: Server, socket: Socket) => {
 
     // Disconnect from the socket room
     socket.leave(roomId);
+    callback({ success: true, gameState });
   }
 }
