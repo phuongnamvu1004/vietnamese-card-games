@@ -10,6 +10,7 @@ interface Player {
   avatar?: string;
 }
 
+
 interface WaitingRoomProps {
   gameType: "sam" | "phom";
   roomId?: string;

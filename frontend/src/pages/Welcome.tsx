@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar.tsx";
 import CyberpunkLayout from "../components/layout/CyberpunkLayout.tsx";
+import NeonButton from "../components/ui/NeonButton.tsx";
 import PokerChip from "../components/ui/PokerChip.tsx";
 import { UserAPI } from "../api/UserApi.ts";
 import GameOption from "../game/shared/GameOptions.tsx";
