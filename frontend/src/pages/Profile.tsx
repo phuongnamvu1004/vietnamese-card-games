@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import defaultAvatar from "../assets/default-avatar.png";
 import { Link } from "react-router-dom";
-import CyberpunkLayout from "../components/Layout/CyberpunkLayout";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout";
 import Logo from "../components/ui/Logo";
 import { UserAPI } from "../api/UserApi";
 

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Layout/Navbar.tsx";
-import CyberpunkLayout from "../components/Layout/CyberpunkLayout.tsx";
+import Navbar from "../components/layout/Navbar.tsx";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout.tsx";
 import NeonButton from "../components/ui/NeonButton.tsx";
 import PokerChip from "../components/ui/PokerChip.tsx";
 import { UserAPI } from "../api/UserApi.ts";
+import GameOption from "../game/shared/GameOptions.tsx";
+import SamOptions from "../game/sam/SamOptions.tsx";
+import PhomOptions from "../game/phom/PhomOptions.tsx";
 
-const Game: React.FC = () => {
-  const [, setUser] = useState<null | {
-    fullName: string;
-    profilePicture: string;
-  }>(null);
+const Welcome: React.FC = () => {
+  const [, setUser] = useState<null | { fullName: string; profilePicture: string }>(null);
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [hoveredChip, setHoveredChip] = useState<number | null>(null);
@@ -23,8 +23,7 @@ const Game: React.FC = () => {
           fullName: res.data.fullName,
           profilePicture: res.data.profilePic || "/assets/default-avatar.png",
         });
-      } catch (error) {
-        console.error("Not authenticated:", error);
+      } catch {
         navigate("/login");
       }
     };
@@ -70,12 +69,13 @@ const Game: React.FC = () => {
           onLeave={() => setHoveredChip(null)}
         />
       ))}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-[50%] bg-blue-900/30 border border-cyan-500/50 shadow-[0_0_40px_5px_rgba(6,182,212,0.3)] backdrop-blur-sm">
+
+      <div className="absolute top-1/2 left-1/2 -mt-20 transform -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-[50%] bg-blue-900/30 border border-cyan-500/50 shadow-[0_0_40px_5px_rgba(6,182,212,0.3)] backdrop-blur-sm">
         <div className="absolute inset-0 opacity-5 bg-repeat mix-blend-overlay" style={{ backgroundImage: `url('/textures/digital-noise.png')` }}></div>
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/70 to-cyan-500/0"></div>
         <div className="absolute top-1/2 left-0 transform -translate-y-1/2 h-px w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/70 to-cyan-500/0"></div>
 
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex justify-center">
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 flex justify-center">
           {cards.map((item, index) => (
             <div
               key={index}
@@ -84,7 +84,7 @@ const Game: React.FC = () => {
                 transform: `${item.transform} translateY(${hoveredCard === index ? "-30px" : "0px"})`,
                 transition: "all 0.3s ease",
                 marginLeft: index > 0 ? "-30px" : "0",
-                boxShadow: hoveredCard === index ? `0 0 30px 5px rgba(6,182,212,0.7)` : ""
+                boxShadow: hoveredCard === index ? `0 0 30px 5px rgba(6,182,212,0.7)` : "",
               }}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -93,49 +93,25 @@ const Game: React.FC = () => {
               <span className={`text-transparent bg-clip-text bg-gradient-to-br ${item.primaryColor} ${item.secondaryColor} text-5xl font-bold`}>
                 {item.card}
               </span>
-              {hoveredCard === index && <div className="absolute -inset-px rounded-lg animate-pulse border border-cyan-500"></div>}
             </div>
           ))}
         </div>
       </div>
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 gap-8 pt-24">
-        <h1 className="text-3xl font-mono text-cyan-300 glitch-text mb-8">
+
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 pt-12 gap-8">
+        <h1 className="text-3xl font-mono text-cyan-300 glitch-text mb-2">
           CHOOSE YOUR GAME
         </h1>
-        <div className="flex flex-col gap-8 w-80">
-          <NeonButton to="/create-room" color="cyan" fullWidth size="lg">
-            Play Sâm
-          </NeonButton>
-          <NeonButton to="/game/phom" color="pink" fullWidth size="lg">
-            Play Phỏm
-          </NeonButton>
+        <div className="flex justify-center gap-12 w-full max-w-3xl -mt-4">
+          <GameOption title="Sâm" color="cyan" SubComponent={SamOptions} />
+          <GameOption title="Phỏm" color="pink" SubComponent={PhomOptions} />
         </div>
-
         <div className="absolute bottom-6 w-full text-center text-cyan-400 font-mono text-sm">
           / ENJOY THE TRADITIONAL VIETNAMESE CARD EXPERIENCE /
         </div>
       </div>
-      <style>{`
-        @keyframes glitch {
-          0% {
-            text-shadow: 0.05em 0 0 rgba(255,0,0,0.7), -0.05em -0.025em 0 rgba(0,255,0,0.7), -0.025em 0.05em 0 rgba(0,0,255,0.7);
-          }
-          15% {
-            text-shadow: -0.05em 0.025em 0 rgba(255,0,0,0.7), 0.025em 0.05em 0 rgba(0,255,0,0.7), 0.05em -0.05em 0 rgba(0,0,255,0.7);
-          }
-          50% {
-            text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.7), 0.05em 0 0 rgba(0,255,0,0.7), 0 -0.05em 0 rgba(0,0,255,0.7);
-          }
-          100% {
-            text-shadow: -0.025em -0.05em 0 rgba(255,0,0,0.7), 0.025em 0.05em 0 rgba(0,255,0,0.7), -0.05em 0 0 rgba(0,0,255,0.7);
-          }
-        }
-        .glitch-text {
-          animation: glitch 1.5s infinite;
-        }
-      `}</style>
     </CyberpunkLayout>
   );
 };
 
-export default Game;
+export default Welcome;

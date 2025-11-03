@@ -1,29 +1,31 @@
-// To show the dfraw pile as stacked CardBacks 
-// clicking the deck should draw a card (if any left)
-// Reason why choosinng to show 3 cards max ( fake the lock of the stack):
-// 1. visually appealing
-// 2. indicates there are cards left in the deck
-// 3. avoids clutter if many cards left
-
+import React from "react";
 import { Card } from "../../../../backend/src/game/shared/cards";
 import CardBack from "./card/CardBack";
-import React from "react";
 
 interface DeckProps {
   deck: Card[];
   onDraw: () => void;
+  disabled?: boolean;
 }
 
-const Deck: React.FC<DeckProps> = ({ deck, onDraw }) => {
+const Deck: React.FC<DeckProps> = ({ deck, onDraw, disabled = false }) => {
   const cardsToShow = deck.slice(-3);
+
   const handleClick = () => {
-    if (deck.length > 0) {
-      onDraw();
-    }
+    if (!disabled && deck.length > 0) onDraw();
   };
 
   return (
-    <div style={{ position: "relative", width: "80px", height: "120px", cursor: deck.length > 0 ? "pointer" : "default" }} onClick={handleClick}>
+    <div
+      title={deck.length > 0 ? "Draw a card" : "Deck empty"}
+      style={{
+        position: "relative",
+        width: "80px",
+        height: "120px",
+        cursor: deck.length > 0 && !disabled ? "pointer" : "not-allowed",
+      }}
+      onClick={handleClick}
+    >
       {cardsToShow.map((_, index) => (
         <div
           key={index}

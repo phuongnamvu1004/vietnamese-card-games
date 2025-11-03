@@ -1,6 +1,6 @@
 import { UserAPI } from "../api/UserApi";
 import React, { useEffect, useState } from "react";
-import CyberpunkLayout from "../components/Layout/CyberpunkLayout.tsx";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout.tsx";
 import Logo from "../components/ui/Logo.tsx";
 import Neonbutton from "../components/ui/NeonButton.tsx";
 import PokerChip from "../components/ui/PokerChip.tsx";

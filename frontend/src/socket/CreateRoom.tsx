@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { RoomApi } from "../api/RoomApi";
 import { useSocket } from "./SocketProvider";
 import CyberpunkInput from "../components/ui/CyberpunkInput";
 import NeonButton from "../components/ui/NeonButton";
 import AuthFormLayout from "../components/ui/AuthFormLayout";
-import CyberpunkLayout from "../components/Layout/CyberpunkLayout";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout";
+
 
 const CreateRoom: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { socket, connected } = useSocket();
   const token = localStorage.getItem("token")!;
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -27,11 +29,17 @@ const CreateRoom: React.FC = () => {
     players: [],
   });
 
+  useEffect(() => {
+    const newGameType = location.pathname.includes("phom") ? "phom" : "sam";
+    setForm((prev) => ({ ...prev, gameType: newGameType }));
+  }, [location.pathname]);
+
   const [status, setStatus] = useState("");
 
   const handleCreate = async () => {
     try {
       setStatus("Creating room...");
+      console.log("Token being sent:", token);
       const data = await RoomApi.create(token, form);
       const roomId = data.roomId;
 
@@ -65,28 +73,27 @@ const CreateRoom: React.FC = () => {
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <AuthFormLayout title="CREATE NEW ROOM">
           <div className="space-y-5">
-            <div>
-              <label className="text-sm font-mono text-cyan-300">GAME TYPE</label>
-              <select
-                className="block w-full bg-gray-800/50 border border-gray-700 rounded-md text-gray-200 px-4 py-3 mt-2 font-mono focus:border-pink-500 focus:shadow-[0_0_10px_rgba(236,72,153,0.3)] transition-all"
-                value={form.gameType}
-                onChange={(e) =>
-                  setForm({ ...form, gameType: e.target.value as "sam" | "phom" })
-                }
-              >
-                <option value="sam">Sâm</option>
-                <option value="phom">Phỏm</option>
-              </select>
-            </div>
+            <CyberpunkInput
+              id="gameType"
+              name="gameType"
+              label="GAME TYPE"
+              type="text"
+              value={form.gameType}
+              disabled
+              onChange={() => {}}
+            />
 
             <CyberpunkInput
               id="maxPlayers"
               name="maxPlayers"
-              label="MAX PLAYERS"
+              label="MAX PLAYERS "
               type="number"
+              min={1}
+              max={4}
               value={String(form.maxPlayers)}
               onChange={(e) =>
-                setForm({ ...form, maxPlayers: parseInt(e.target.value) })
+                setForm({ ...form, maxPlayers: Math.min(4, Math.max(1, parseInt(e.target.value))) 
+                })
               }
             />
 
@@ -95,9 +102,11 @@ const CreateRoom: React.FC = () => {
               name="buyIn"
               label="BUY-IN AMOUNT"
               type="number"
+              step={10}
               value={String(form.buyIn)}
               onChange={(e) =>
-                setForm({ ...form, buyIn: parseInt(e.target.value) })
+                setForm({ ...form, buyIn: parseInt(e.target.value) 
+                })
               }
             />
 
@@ -106,9 +115,28 @@ const CreateRoom: React.FC = () => {
               name="betUnit"
               label="BET UNIT"
               type="number"
+              step={10}
               value={String(form.betUnit)}
               onChange={(e) =>
                 setForm({ ...form, betUnit: parseInt(e.target.value) })
+              }
+            />
+
+            <CyberpunkInput
+              id="players"
+              name="players"
+              label="INVITE PLAYER VIA EMAILS"
+              type="text"
+              placeholder="e.g. friend1@email.com, friend2@email.com"
+              value={form.players.join(", ")}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  players: e.target.value
+                    .split(",")
+                    .map((email) => email.trim())
+                    .filter((email) => email.length > 0),
+                })
               }
             />
 
@@ -123,11 +151,10 @@ const CreateRoom: React.FC = () => {
 
             {status && (
               <p
-                className={`text-center font-mono text-sm ${
-                  status.includes("success")
+                className={`text-center font-mono text-sm ${status.includes("success")
                     ? "text-cyan-400"
                     : "text-pink-400"
-                }`}
+                  }`}
               >
                 {status}
               </p>

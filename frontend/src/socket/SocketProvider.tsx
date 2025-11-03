@@ -47,6 +47,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
+  const disconnectSocket = useCallback(() => {
+    if (socket) {
+      console.log("Closing socket connection...");
+      socket.disconnect();
+      setSocket(null);
+      setConnected(false);
+    }
+  }, [socket]);
+
   const fetchToken = useCallback(async (): Promise<string | null> => {
     try {
       const response = await fetch(`${backendUrl}/api/auth/refresh`, {
@@ -56,7 +65,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          console.warn("Refresh token expired or invalid.");
+          localStorage.removeItem("token");
+          disconnectSocket();
+          return null;
+        }
         console.warn("Token refresh failed:", response.status);
+        localStorage.removeItem("token");
         return localStorage.getItem("token"); 
       }
 
@@ -72,9 +88,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return localStorage.getItem("token");
     } catch (err) {
       console.error("Error fetching refresh token:", err);
-      return localStorage.getItem("token");
+      localStorage.removeItem("token");
+      disconnectSocket();
+      return null;
     }
-  }, [backendUrl]);
+  }, [backendUrl, disconnectSocket]);
 
   const connectSocket = useCallback(
     async (manualToken?: string) => {
@@ -114,15 +132,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     },
     [backendUrl, fetchToken]
   );
-
-  const disconnectSocket = useCallback(() => {
-    if (socket) {
-      console.log("Closing socket connection...");
-      socket.disconnect();
-      setSocket(null);
-      setConnected(false);
-    }
-  }, [socket]);
 
  
   useEffect(() => {

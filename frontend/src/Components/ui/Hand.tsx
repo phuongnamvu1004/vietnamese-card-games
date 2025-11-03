@@ -1,9 +1,7 @@
-// To render a row of cards for one player 
-// Features: cards slightly overlapped, hover animation, selection toggle
-
 import { useState } from "react";
 import CardDisplay from "./card/CardDisplay";
 import { Card } from "../../../../backend/src/game/shared/cards";
+import NeonButton from "../../components/ui/NeonButton";
 
 interface HandProps {
   cards: Card[];
@@ -14,6 +12,7 @@ interface HandProps {
 
 const Hand: React.FC<HandProps> = ({ cards, isFaceUp = true, onPlay, onPass }) => {
   const [selectedCards, setSelectedCards] = useState<Card[]>([]);
+  const [hoveredCard, setHoveredCard] = useState<Card | null>(null);
 
   const isCardSelected = (card: Card) =>
     selectedCards.some((c) => c.toString() === card.toString());
@@ -39,38 +38,47 @@ const Hand: React.FC<HandProps> = ({ cards, isFaceUp = true, onPlay, onPass }) =
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex">
+      {/* HAND DISPLAY */}
+      <div className="flex justify-center">
         {cards.map((card, index) => (
-          <CardDisplay
-            key={card.toString()}   
-            card={card}
-            index={index}
-            transform="rotate(0deg)"
-            isFaceUp={isFaceUp}
-            isHovered={false}
-            onMouseEnter={() => {}}
-            onMouseLeave={() => {}}
-            primaryColor="from-cyan-400"
-            secondaryColor="to-blue-500"
-            selected={isCardSelected(card)}
-            onClick={() => toggleSelect(card)}
-          />
+          <div
+            key={card.toString()}
+            style={{ marginLeft: index > 0 ? "-28px" : "0" }}
+          >
+            <CardDisplay
+              card={card}
+              index={index}
+              transform="rotate(0deg)"
+              isFaceUp={isFaceUp}
+              isHovered={hoveredCard?.toString() === card.toString()}
+              onMouseEnter={() => setHoveredCard(card)}
+              onMouseLeave={() => setHoveredCard(null)}
+              primaryColor="from-cyan-400"
+              secondaryColor="to-blue-500"
+              selected={isCardSelected(card)}
+              onClick={() => toggleSelect(card)}
+            />
+          </div>
         ))}
       </div>
-      <div className="flex gap-4 mt-4">
-        <button
-          className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+
+      {/* ACTION BUTTONS */}
+      <div className="flex gap-6 mt-6">
+        <NeonButton
+          color="cyan"
+          size="md"
           onClick={handlePlay}
           disabled={selectedCards.length === 0}
         >
           Play
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-500 text-white rounded"
+        </NeonButton>
+        <NeonButton
+          color="pink"
+          size="md"
           onClick={handlePass}
         >
           Pass
-        </button>
+        </NeonButton>
       </div>
     </div>
   );

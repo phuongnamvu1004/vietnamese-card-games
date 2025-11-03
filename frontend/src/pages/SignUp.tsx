@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CyberpunkLayout from "../components/Layout/CyberpunkLayout";
+import CyberpunkLayout from "../components/layout/CyberpunkLayout";
 import Logo from "../components/ui/Logo";
 import CyberpunkInput from "../components/ui/CyberpunkInput";
 import NeonButton from "../components/ui/NeonButton";
@@ -61,7 +61,6 @@ const SignUp: React.FC = () => {
         localStorage.setItem("token", token);
         connectSocket(token);
       }
-      setMessage("Signup successful! Redirecting...");
       setTimeout(() => navigate("/welcome"), 1500);
     } catch (error: any) {
       console.error("Signup error:", error);

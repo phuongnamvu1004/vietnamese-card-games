@@ -13,7 +13,7 @@ export const RoomApi = {
       players: string[];
     }
   ) => {
-    const res = await axios.post(`${backendUrl}/api/room`, body, {
+    const res = await axios.post(`${backendUrl}/api/room/create-room`, body, {
       headers: { Authorization: `Bearer ${token}` },
       withCredentials: true,
     });

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen from "../layout/LoadingScreen";
 
 interface CyberpunkLayoutProps {
   children: ReactNode;
