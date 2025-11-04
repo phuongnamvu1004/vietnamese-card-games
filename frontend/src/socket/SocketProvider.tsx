@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 interface ServerToClientEvents {
   "invitation:created": (data: any) => void;
@@ -10,11 +11,8 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   joinRoom: (
     data: {
-      roomId: string;
+      room: any;
       userId: number;
-      playerName: string;
-      buyIn: number;
-      gameBalance: number;
     },
     callback: (res: {
       success?: boolean;
@@ -28,15 +26,15 @@ interface ClientToServerEvents {
 type SocketContextType = {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   connected: boolean;
-  connectSocket: (token?: string) => void; 
+  connectSocket: (token?: string) => void;
   disconnectSocket: () => void;
 };
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   connected: false,
-  connectSocket: () => {},
-  disconnectSocket: () => {},
+  connectSocket: () => { },
+  disconnectSocket: () => { },
 });
 
 export const useSocket = () => useContext(SocketContext);
@@ -44,6 +42,7 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
+  const navigate = useNavigate();
 
   const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
@@ -60,7 +59,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const response = await fetch(`${backendUrl}/api/auth/refresh`, {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
 
@@ -73,7 +72,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
         console.warn("Token refresh failed:", response.status);
         localStorage.removeItem("token");
-        return localStorage.getItem("token"); 
+        return localStorage.getItem("token");
       }
 
       const data = await response.json();
@@ -119,6 +118,33 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setConnected(true);
       });
 
+      s.on("invitation:batchCreated", (data: any) => {
+        try {
+          const { room } = data || {};
+          const user = JSON.parse(localStorage.getItem("user") || "{}");
+          if (room && user?.id) {
+            s.emit("joinRoom", { room, userId: user.id }, (res: any) => {
+              if (res?.success) {
+                navigate("/waiting-room", { state: { room, host: user } });
+              } else {
+                console.error("Failed to join as host:", res?.error);
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Error handling invitation:batchCreated:", e);
+        }
+      });
+
+      s.on("invitation:created", (data: any) => {
+        try {
+          console.log("Received invitation:created event", data);
+          // TODO: handle invitation request later (send notification)
+        } catch (e) {
+          console.error("Error handling invitation:created:", e);
+        }
+      });
+
       s.on("disconnect", (reason) => {
         console.warn("Socket disconnected:", reason);
         setConnected(false);
@@ -130,10 +156,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       setSocket(s);
     },
-    [backendUrl, fetchToken]
+    [backendUrl, fetchToken, navigate]
   );
 
- 
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) connectSocket(savedToken);

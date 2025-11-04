@@ -9,9 +9,8 @@ import CyberpunkLayout from "../components/layout/CyberpunkLayout";
 
 
 const CreateRoom: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { socket, connected } = useSocket();
+  const {connected } = useSocket();
   const token = localStorage.getItem("token")!;
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -41,28 +40,7 @@ const CreateRoom: React.FC = () => {
       setStatus("Creating room...");
       console.log("Token being sent:", token);
       const data = await RoomApi.create(token, form);
-      const roomId = data.roomId;
-
-      if (!socket || !connected) throw new Error("Socket not connected");
-
-      socket.emit(
-        "joinRoom",
-        {
-          roomId,
-          userId: user.id,
-          playerName: user.fullName,
-          buyIn: form.buyIn,
-          gameBalance: user.balance,
-        },
-        (res) => {
-          if (res.success) {
-            setStatus("Joined room successfully!");
-            navigate(`/room/${roomId}`, {
-              state: { gameState: res.gameState, isHost: res.isHost },
-            });
-          } else setStatus(res.error || "Failed to join room");
-        }
-      );
+      setStatus("Room created successfully!");
     } catch (err: any) {
       setStatus(err.response?.data?.message || err.message);
     }
