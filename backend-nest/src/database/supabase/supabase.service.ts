@@ -1,0 +1,27 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+@Injectable()
+export class SupabaseService {
+  public readonly client: SupabaseClient;
+
+  constructor(private readonly configService: ConfigService) {
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    const supabaseKey = this.configService.get<string>('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase configuration in environment variables.');
+    }
+
+    this.client = createClient(supabaseUrl, supabaseKey);
+  }
+
+  async testConnection(): Promise<void> {
+    const { error } = await this.client.from('users').select('*').limit(1);
+
+    if (error) {
+      throw new Error(`Supabase connection test failed: ${error.message}`);
+    }
+  }
+}
