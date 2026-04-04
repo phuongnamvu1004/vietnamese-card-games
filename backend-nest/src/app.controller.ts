@@ -9,4 +9,14 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('health/supabase')
+  getDatabaseHealth() {
+    return this.appService.getDatabaseHealth();
+  }
+
+  @Get('health/redis')
+  getRedisHealth() {
+    return this.appService.getRedisHealth();
+  }
 }
