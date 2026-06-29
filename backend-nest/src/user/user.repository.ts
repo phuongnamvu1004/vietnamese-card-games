@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase';
 import type { SafeUser } from './interfaces/safe-user.interface';
 import type { User } from './interfaces/user.interface';
